@@ -22,7 +22,7 @@ dense3 = Dense(4,activation='relu')(dense2)
 outputs = Dense(2)(dense3)
 model = Model(inputs = input1,outputs = outputs)
 model.compile(loss='mse',optimizer='adam',metrics=['mae'])
-model.fit(x_train,y_train,epochs=100,batch_size=1,validation_split=0.2,verbose=0)
+model.fit(x_train,y_train,epochs=100,batch_size=1,validation_split=0.2,verbose=1)
 
 
 loss,mae = model.evaluate(x_test,y_test,batch_size=1)
@@ -38,7 +38,7 @@ print('rmse : ',rmse,'\tr2 : ',r2)
 
 for i in range(5,10):
     print('test : ',y_test[i],'predict : ',y_predict[i])
-
+model.summary()
 
 
 

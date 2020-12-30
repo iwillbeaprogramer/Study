@@ -1,4 +1,6 @@
-# 다:다
+# 다:다 mlp 함수형
+# keras10_mlp3를 함수형으로 바꾸시오
+
 import numpy as np
 x = np.array([range(100),
              range(301,401),
@@ -39,7 +41,10 @@ r2 = r2_score(y_test,y_predict)
 
 print('rmse : ',rmse,'\tr2 : ',r2)
 
-
+'''
+loss :  0.14589956402778625     mae :  0.35155418515205383
+rmse :  0.38197601909579526     r2 :  0.9998260418256382
+'''
 
 
 

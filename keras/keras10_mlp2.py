@@ -1,3 +1,4 @@
+#다 : 1 mlp
 import numpy as np
 x = np.array([range(100),
              range(301,401),

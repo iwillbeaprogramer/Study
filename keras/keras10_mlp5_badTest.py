@@ -1,3 +1,4 @@
+# 다:다
 # 실습
 
 import numpy as np

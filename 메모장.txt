@@ -62,7 +62,7 @@ loss,acc,metrics 안나오고 해당 epochs만 나옴
 
 
 ctrl + space 세부
-
+Dense 의 activation 은 default가 linear
 
 
 
