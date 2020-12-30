@@ -1,0 +1,25 @@
+1.스칼라 - 벡터 - 행렬 - 텐서
+스칼라는 하나의 숫자를 의미함
+벡터는 숫자의 배열을 의미함
+행렬은 2차원의 배열
+텐서는 2차원 이상의 배열
+
+2.train_test_size
+1. 한가지의 파라미터만 들어갈 경우 그 외의 나머지를 반대로 
+2. 둘다 있을때 1 초과이면 에러
+3. 둘다 있는데 0.7/0.2 이면
+1~70, 71~90/91에서 버려짐
+
+
+
+3.batch_size 조사
+batch_size 의 디폴트는 16
+가중치 갱신은 batch_size만큼 보고 갱신함
+즉 한 epoch에 여러번의 가중치 갱신이 일어남
+
+배치사이즈가 작을수록 가중치 갱신이 자주 일어납니다.
+
+
+github : https://github.com/iwillbeaprogramer
+데이콘 : wisixicidi@khu.ac.kr
+kaggle : wisixicidi@gmail.com
