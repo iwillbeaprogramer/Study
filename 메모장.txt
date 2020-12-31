@@ -65,7 +65,11 @@ ctrl + space 세부
 Dense 의 activation 은 default가 linear
 
 
+12/31
 
+왜 concatenate하나?
+서로 출저가 다른 데이터셋을 단순히 합쳐서 하면 애매함
+그럴때 각각의 노드를 주고나서 모델에서 합치는게 좋음
 
 
 
