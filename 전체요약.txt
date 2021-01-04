@@ -1,0 +1,32 @@
+<train_test_split>
+from sklearn.model_selection import train_test_split
+train_test_split(x,y,test_size=0.2,stratify = y)
+
+<정규화>
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+scaler.fit(x_train)
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+x_val = scaler.transform(x_val)
+
+<원핫 인코딩>
+from sklearn.preprocessing import OneHotEncoder
+onehot = OneHotEncoder()
+onehot.fit(y.reshape(-1,1))
+y = onehot.transform(y.reshape(-1.1)).toarray()
+from tensorflow.keras.utils import to_categorical
+y = to_categorical(y)
+
+<r2,mean_squared_error>
+from sklearn.metrics import r2_score
+y_predict = model.predict(x_test)
+r2 = r2_score(y_predict,y_test)
+
+<early_stopping>
+from tensorflow.keras.callbacks import EarlyStopping
+early_stopping = EarlyStopping(monitor='val_loss',patience = 20, mode = 'auto')
+
+
+
+

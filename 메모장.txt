@@ -74,3 +74,24 @@ Dense 의 activation 은 default가 linear
 
 
 
+
+
+1/4
+binary_classification
+categorical_classification
+softmax : 분류 하고자 하는 숫자의 갯수만큼 마지막층의 노드를 잡는다. 그리고 activation='softmax'
+
+ sklearn : onehot encoding
+ keras : to_categorical
+
+두개의 차이점 : to_categorical -> 무조건 0부터 : 그래서 1,2,3 을 넣으면 하면 0 하나 더 넣어줘야함 [0,0,0,0] 4차원벡터생성
+y = to_categorical(datasets.target)
+
+sklearn
+onehot = OneHotEncoder()
+onehot.fit(y.reshape(-1,1))
+y = onehot.transform(y.reshape(-1,1)).toarray()
+
+
+
+
