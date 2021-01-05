@@ -1,3 +1,15 @@
+<LSTM>
+4x(1+1+10)x10
+첫번쨰 1은 인풋딤 두번째일은 바이어스 3번쨰는 10개가 돌아오는거
+(행,열,몇개식 짜르는지)
+(배치사이즈,타임스탭,인풋딤)
+lstm에 인풋쉐이프 에서는  input_shape = (time_step, input_dim) 이렇게 넣어주거나
+좀 훈련속도를 늘리기 위해 배치까지 정하려면 batch_input_shape = (batct_size,time_stemp,input_dim)
+
+LSTM의 액티베이션 디폴트? 하이퍼볼리기 탄젠트
+LSTM 게이트 : output_gate,input_gate,forget_gate,memory_cell?
+GRU 파라미터 : 3 * n * (n + m + 1(bias) +1(cell state))
+
 <train_test_split>
 from sklearn.model_selection import train_test_split
 train_test_split(x,y,test_size=0.2,stratify = y)
@@ -34,6 +46,8 @@ activation     sig      softmax
 loss         binary     categorical
 metrics        acc      acc
 predict     np.where / argmax
+
+
 
 
 

@@ -18,7 +18,7 @@ model.add(Dense(1))
 model.summary()
 
 
-'''
+
 # 3. 모델 컴파일 훈련
 model.compile(loss = 'mse',optimizer='adam')
 model.fit(x,y,epochs=100,batch_size=1)
@@ -30,7 +30,10 @@ x_pred = np.array([5,6,7]) # (3,) ->(1,3,1)
 x_pred = x_pred.reshape(1,3,1)
 y_pred = model.predict(x_pred)
 print('y_pred : ',y_pred)
-'''
+
+
+
+
 # LSTM 행 렬 몇개식 짜르는지
 # LSTM 행 렬 몇개식 짜르는지
 # LSTM 행 렬 몇개식 짜르는지
