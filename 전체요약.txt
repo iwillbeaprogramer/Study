@@ -28,5 +28,13 @@ from tensorflow.keras.callbacks import EarlyStopping
 early_stopping = EarlyStopping(monitor='val_loss',patience = 20, mode = 'auto')
 
 
+             <이진 vs 다중>
+y onehot        x        o
+activation     sig      softmax   
+loss         binary     categorical
+metrics        acc      acc
+predict     np.where / argmax
+
+
 
 
