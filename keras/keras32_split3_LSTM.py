@@ -44,7 +44,6 @@ x_pred = x_pred[:,:-1]
 
 x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2)
 x_train,x_val,y_train,y_val = train_test_split(x_train,y_train,test_size=0.2)
-
 scaler = MinMaxScaler()
 scaler.fit(x_train)
 x_train = scaler.transform(x_train)
@@ -56,7 +55,9 @@ x_train=x_train.reshape(-1,5,1)
 x_test=x_test.reshape(-1,5,1)
 x_val=x_val.reshape(-1,5,1)
 x_pred = x_pred.reshape(-1,5,1)
+print(x_train)
 
+'''
 model = Sequential()
 model.add(LSTM(128,activation='relu',input_shape=(5,1)))
 model.add(Dense(64,activation='relu'))
@@ -81,7 +82,7 @@ r2 = r2_score(y_hat,y_test)
 print("loss : ",loss)
 print('r2 : ',r2)
 print('rmse : ',rmse**0.5)
-
+'''
 '''
 [[101.642494]
  [102.80078 ]

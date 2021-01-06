@@ -68,7 +68,7 @@ model.add(Dense(4,activation='relu'))
 model.add(Dense(2,activation='relu'))
 model.add(Dense(1,))
 model.compile(loss = 'mse',optimizer = 'adam')
-model.fit(x_train,y_train,validation_data = (x_val,y_val),epochs=2000,callbacks=[early_stopping],batch_size=4)
+model.fit(x_train,y_train,validation_data = (x_val,y_val),epochs=5000,callbacks=[early_stopping],batch_size=4)
 
 loss = model.evaluate(x_test,y_test,batch_size = 4)
 y_hat = model.predict(x_test)
