@@ -10,7 +10,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense,LSTM
 from sklearn.metrics import r2_score
 
-x = x.reshape(13,3,1)
+x = x.reshape(x.shape[0],x.shape[1],1)
 model = Sequential()
 model.add(LSTM(1024,input_shape=(3,1),activation='relu',return_sequences=True))
 model.add(Dense(1024,activation='relu'))
@@ -24,6 +24,8 @@ model.add(Dense(16,activation='relu'))
 model.add(Dense(8,activation='relu'))
 model.add(Dense(4,activation='relu'))
 model.add(Dense(1))
+model.summary()
+'''
 model.compile(loss='mse',optimizer='adam')
 model.fit(x,y,epochs=500,batch_size=1)
 
@@ -31,6 +33,7 @@ loss = model.evaluate(x,y,batch_size=1)
 y_pred = model.predict(x_pred)
 print(y_pred)
 print('loss : ',loss)
+'''
 '''
 LSTM 1개
 [[81.13962]]
@@ -41,4 +44,10 @@ loss :  0.05985087901353836
 LSTM 2개
 [[76.38666]]
 loss :  0.8654062747955322
+'''
+
+'''
+input_shape가 (none,100,5) ->(none,100,10)
+
+일단 return_sequences=True 이걸 외우자
 '''

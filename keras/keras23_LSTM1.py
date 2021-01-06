@@ -11,14 +11,15 @@ x = x.reshape(4,3,1) #  = np.array([[[1],[2],[3]],[[2],[3],[4]],[[3],[4],[5]],[[
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, LSTM
 model = Sequential()
-model.add(LSTM(10, activation='relu',input_shape = (3,1))) #LSTM레이어를 쓰려면 데이터구조가 3차원이여야함 / 한개식 잘라서 작업을함 여기서는 (4,3)-> (4,3,1) LSTM에 넣기 위해서
+model.add(LSTM(10, activation='relu',return_sequences=True,input_shape = (3,1))) #LSTM레이어를 쓰려면 데이터구조가 3차원이여야함 / 한개식 잘라서 작업을함 여기서는 (4,3)-> (4,3,1) LSTM에 넣기 위해서
+model.add(LSTM(10))
 model.add(Dense(20))
 model.add(Dense(10))
 model.add(Dense(1))
 model.summary()
 
 
-
+'''
 # 3. 모델 컴파일 훈련
 model.compile(loss = 'mse',optimizer='adam')
 model.fit(x,y,epochs=100,batch_size=1)
@@ -50,7 +51,7 @@ print('y_pred : ',y_pred)
 # LSTM 행 렬 몇개식 짜르는지
 # LSTM 행 렬 몇개식 짜르는지
 # LSTM 행 렬 몇개식 짜르는지
-
+'''
 '''
 4x(1+1+10)x10
 첫번쨰 1은 인풋딤 두번째일은 바이어스 3번쨰는 10개가 돌아오는거
@@ -63,11 +64,11 @@ LSTM의 액티베이션 디폴트? 하이퍼볼리기 탄젠트
 LSTM 게이트 : output_gate,input_gate,forget_gate,memory_cell?
 '''
 
+'''
+input_shape가 (none,100,5) ->(none,100,10)
 
-
-
-
-
+일단 return_sequences=True 이걸 외우자
+'''
 
 
 
