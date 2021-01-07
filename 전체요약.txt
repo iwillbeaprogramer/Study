@@ -1,3 +1,5 @@
+
+
 	데이터 구조		input_shape
 Dense	(행, 열)  <- 2차원		(열, )  <- 1차원
 LSTM	(행, 열, 몇) <- 3차원	(열, 몇)  <- 2차원
@@ -27,6 +29,7 @@ scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 x_val = scaler.transform(x_val)
+의미 잘 생각해야함
 
 <원핫 인코딩>
 from sklearn.preprocessing import OneHotEncoder
