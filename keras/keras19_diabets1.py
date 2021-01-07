@@ -28,7 +28,7 @@ model.fit(x_train,y_train,validation_split=0.2,epochs=200,batch_size=8,verbose=1
 loss = model.evaluate(x_test,y_test,batch_size=8,verbose=0)
 print('loss : ',loss)
 y_predict = model.predict(x_test)
-rmse = mean_squared_error(y_predict,y_test)
+rmse = mean_squared_error(y_predict,y_test)**0.5
 r2 = r2_score(y_predict,y_test)
 print('rmse : ',rmse)
 print('r2_Score : ',r2)
