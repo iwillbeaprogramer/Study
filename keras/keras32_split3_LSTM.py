@@ -57,7 +57,7 @@ x_val=x_val.reshape(-1,5,1)
 x_pred = x_pred.reshape(-1,5,1)
 print(x_train)
 
-'''
+
 model = Sequential()
 model.add(LSTM(128,activation='relu',input_shape=(5,1)))
 model.add(Dense(64,activation='relu'))
@@ -82,7 +82,7 @@ r2 = r2_score(y_hat,y_test)
 print("loss : ",loss)
 print('r2 : ',r2)
 print('rmse : ',rmse**0.5)
-'''
+
 '''
 [[101.642494]
  [102.80078 ]

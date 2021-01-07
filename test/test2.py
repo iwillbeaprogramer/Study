@@ -1,6 +1,6 @@
 import os
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense,LSTM,GRU
+from tensorflow.keras.layers import Dense,LSTM
 import warnings
 warnings.filterwarnings(action='ignore')
 import numpy as np
@@ -282,47 +282,72 @@ plt.plot(ts,x[1,:],label='velocity (true)')
 plt.plot(ts[:-1],hat_x[1,:],alpha=1,label='velocity (Kalman estimates)')
 plt.grid()
 
+Kalman_RMSE_list_N=[]
+DeepLearning_RMSE_list_N_1=[]
+DeepLearning_RMSE_list_N_2=[]
 n_list=[]
-end=201
 
-MODEL_DIR = './model/'
-if not os.path.exists(MODEL_DIR):
-    os.mkdir(MODEL_DIR)
-for n in range(2,201):
-    print(n)
-    modelpath_1 = './my_model/'+'/LSTM_N='+str(n)+'.hdf5'
-    modelpath_2 = './my_model/'+'/LSTM_N='+str(n)+'_multilayer.hdf5'
-    modelpath_3 = './my_model/'+'/GRU_N='+str(n)+'_multilayer.hdf5'
-    checkpointer_1 = ModelCheckpoint(filepath=modelpath_1, monitor = 'loss')
-    checkpointer_2 = ModelCheckpoint(filepath=modelpath_2, monitor = 'loss')
-    checkpointer_3 = ModelCheckpoint(filepath=modelpath_3, monitor = 'loss')
-    es1 = EarlyStopping(monitor='loss',patience=20,mode='auto')
-    es2 = EarlyStopping(monitor='loss',patience=20,mode='auto')
-    es3 = EarlyStopping(monitor='loss',patience=20,mode='auto')
+
+##########            칼만 생성            ##########
+for n in range(4,51):
     n_list.append(n)
-    temp = []
-    for i in range(len(y[0])-n):
-        temp.append(y[0,i:i+n].reshape(n,-1))
-    x_train = np.array(temp).reshape(-1,n,1)
-    y_train = x[0,n:-1]
-    model_1 = Sequential()
-    model_1.add(LSTM(50,input_shape = (n,1)))
-    model_1.add(Dense(1))
-    model_1.compile(loss = 'mse',optimizer = 'adam',metrics=['mse'])
-    history_1 = model_1.fit(x_train,y_train,epochs = 1,verbose = 1,batch_size=batch_size,callbacks=[checkpointer_1,es1])
-    model_2 = Sequential()
-    model_2.add(LSTM(50,input_shape = (n,1),activation='relu'))
-    model_2.add(Dense(50,input_dim = n,activation='relu'))
-    model_2.add(Dense(25,activation='relu'))
-    model_2.add(Dense(5,activation='relu'))
-    model_2.add(Dense(1))
-    model_2.compile(loss = 'mse',optimizer = 'adam',metrics = ['mse'])
-    history_2 = model_2.fit(x_train,y_train,epochs = epochs,verbose = 1,batch_size=batch_size,callbacks=[checkpointer_2,es2])
-    model_3 = Sequential()
-    model_3.add(GRU(50,input_shape = (n,1),activation='relu'))
-    model_3.add(Dense(50,input_dim = n,activation='relu'))
-    model_3.add(Dense(25,activation='relu'))
-    model_3.add(Dense(5,activation='relu'))
-    model_3.add(Dense(1))
-    model_3.compile(loss = 'mse',optimizer = 'adam',metrics = ['mse'])
-    history_3 = model_3.fit(x_train,y_train,epochs = epochs,verbose = 1,batch_size=batch_size,callbacks=[checkpointer_3,es3])
+    sigma_w = B_test@B_test.T
+    sigma_v = 1
+    hat_x = np.zeros((2,N_test))
+    hat_x[:,0] = np.array([0,0])
+    sigma = np.eye(2)*10
+    for t in range(N_test-1):
+        K = A_test@sigma@C_test.T@np.linalg.inv(C_test@sigma@C_test.T+sigma_v)
+        hat_x[:,t+1] = A_test@hat_x[:,t] + K@(y_test[0,t] - C_test@hat_x[:,t])
+        sigma = A_test@sigma@A_test.T - K@C_test@sigma@A_test.T+sigma_w
+
+
+    ##########            딥러닝 생성1            ##########
+    test = []
+    for i in range(len(y_test[0])-n):
+        test.append(y_test[0,i:i+n].reshape(n,-1))
+    x_test_ready_2 = np.array(test).reshape(-1,n)
+    y_test_ready_2 = x_test[0,n:-1]
+    model_1=tf.keras.models.load_model('LSTM_model/N='+str(n)+'.hdf5')
+    model_2=tf.keras.models.load_model('LSTM_model/N='+str(n)+'(multilayer).hdf5')
+    position_hat_1 = model_1.predict(x_test_ready_2)
+    position_hat_2 = model_2.predict(x_test_ready_2)
+
+
+
+    ##########            RMSE                  ###########
+    Kalman_RMSE = 0
+    DeepLearning_RMSE_1 = 0
+    DeepLearning_RMSE_2 = 0
+    for k in range(len(y_test[0])-n):
+        Kalman_RMSE += (x_test[0,n:-1][k]-hat_x[0,n:][k])**2
+        DeepLearning_RMSE_1 += (x_test[0,n:-1][k]-position_hat_1[k])**2
+        DeepLearning_RMSE_2 += (x_test[0,n:-1][k]-position_hat_2[k])**2
+        
+    Kalman_RMSE = (Kalman_RMSE/(len(y_test[0])-n))**0.5
+    DeepLearning_RMSE_1 = (DeepLearning_RMSE_1/(len(y_test[0])-n))**0.5
+    DeepLearning_RMSE_2 = (DeepLearning_RMSE_2/(len(y_test[0])-n))**0.5
+    Kalman_RMSE_list_N.append(Kalman_RMSE)
+    DeepLearning_RMSE_list_N_1.append(DeepLearning_RMSE_1[0])
+    DeepLearning_RMSE_list_N_2.append(DeepLearning_RMSE_2[0])
+
+more = []
+for c in range(len(Kalman_RMSE_list_N)):
+    if Kalman_RMSE_list_N[c]==min(Kalman_RMSE_list_N[c],DeepLearning_RMSE_list_N_1[c],DeepLearning_RMSE_list_N_2[c]):
+        more.append('KalmanFilter Good')
+    elif DeepLearning_RMSE_list_N_1[c]==min(Kalman_RMSE_list_N[c],DeepLearning_RMSE_list_N_1[c],DeepLearning_RMSE_list_N_2[c]):
+        more.append('DeepLearning_1 Good')
+    else :
+        more.append('DeepLearning_2 Good')
+result_dic = {
+    'N': n_list,
+    'Kalman RMSE':Kalman_RMSE_list_N,
+    'DeepLearning RMSE_1':DeepLearning_RMSE_list_N_1,
+    'DeepLearning RMSE_2':DeepLearning_RMSE_list_N_2,
+    'Better':more
+}
+df_N = pd.DataFrame(result_dic)
+print("Best case DeepLearning")
+print(df_N.iloc[DeepLearning_RMSE_list_N_1.index(min(DeepLearning_RMSE_list_N_1))])
+print(df_N.iloc[DeepLearning_RMSE_list_N_2.index(min(DeepLearning_RMSE_list_N_2))])
+df_N.to_csv('LSTM_result.csv')
