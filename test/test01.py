@@ -12,7 +12,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint,EarlyStopping
 seed=300
 #seed=221
 epochs=200
-batch_size=16
+batch_size=4
 
 N = 10000 # number of timesteps
 T = 500 # time will vary from 0 to T with step delt
@@ -293,9 +293,9 @@ for n in range(2,201):
     modelpath_1 = './my_model/'+'/LSTM_N='+str(n)+'.hdf5'
     modelpath_2 = './my_model/'+'/LSTM_N='+str(n)+'_multilayer.hdf5'
     modelpath_3 = './my_model/'+'/GRU_N='+str(n)+'_multilayer.hdf5'
-    checkpointer_1 = ModelCheckpoint(filepath=modelpath_1, monitor = 'loss')
-    checkpointer_2 = ModelCheckpoint(filepath=modelpath_2, monitor = 'loss')
-    checkpointer_3 = ModelCheckpoint(filepath=modelpath_3, monitor = 'loss')
+    checkpointer_1 = ModelCheckpoint(filepath=modelpath_1, monitor = 'loss',save_best_only=True)
+    checkpointer_2 = ModelCheckpoint(filepath=modelpath_2, monitor = 'loss',save_best_only=True)
+    checkpointer_3 = ModelCheckpoint(filepath=modelpath_3, monitor = 'loss',save_best_only=True)
     es1 = EarlyStopping(monitor='loss',patience=20,mode='auto')
     es2 = EarlyStopping(monitor='loss',patience=20,mode='auto')
     es3 = EarlyStopping(monitor='loss',patience=20,mode='auto')
