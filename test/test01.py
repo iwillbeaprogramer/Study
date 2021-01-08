@@ -285,6 +285,12 @@ plt.grid()
 n_list=[]
 end=201
 
+'''
+모델훈련
+'''
+
+
+'''
 MODEL_DIR = './model/'
 if not os.path.exists(MODEL_DIR):
     os.mkdir(MODEL_DIR)
@@ -326,3 +332,116 @@ for n in range(2,201):
     model_3.add(Dense(1))
     model_3.compile(loss = 'mse',optimizer = 'adam',metrics = ['mse'])
     history_3 = model_3.fit(x_train,y_train,epochs = epochs,verbose = 1,batch_size=batch_size,callbacks=[checkpointer_3,es3])
+'''
+
+
+
+'''
+    딥러닝 생성
+'''
+
+Kalman_RMSE_list_N=[]
+DeepLearning_RMSE_list_N_1=[]
+DeepLearning_RMSE_list_N_2=[]
+LSTM_only_RMSE_list=[]
+LSTM_multi_RMSE_list=[]
+GRU_multi_RMSE_list=[]
+n_list=[]
+
+
+
+##########            칼만 생성            ##########
+for n in range(2,13):
+    n_list.append(n)
+    sigma_w = B_test@B_test.T
+    sigma_v = 1
+    hat_x = np.zeros((2,N_test))
+    hat_x[:,0] = np.array([0,0])
+    sigma = np.eye(2)*10
+    for t in range(N_test-1):
+        K = A_test@sigma@C_test.T@np.linalg.inv(C_test@sigma@C_test.T+sigma_v)
+        hat_x[:,t+1] = A_test@hat_x[:,t] + K@(y_test[0,t] - C_test@hat_x[:,t])
+        sigma = A_test@sigma@A_test.T - K@C_test@sigma@A_test.T+sigma_w
+
+
+    ##########            딥러닝 생성1            ##########
+    test = []
+    for i in range(len(y_test[0])-n):
+        test.append(y_test[0,i:i+n].reshape(n,-1))
+    x_test_ready_2 = np.array(test).reshape(-1,n)
+    y_test_ready_2 = x_test[0,n:-1]
+    x_test_ready_2_rnn = np.array(test).reshape(-1,n,1)
+    #model_1=tf.keras.models.load_model('./my_model/N='+str(n)+'.hdf5')
+    #model_2=tf.keras.models.load_model('./my_model/N='+str(n)+'(multilayer).hdf5')
+    model_3=tf.keras.models.load_model('./my_model/LSTM_N='+str(n)+'.hdf5')
+    model_4=tf.keras.models.load_model('./my_model/LSTM_N='+str(n)+'_multilayer.hdf5')
+    model_5=tf.keras.models.load_model('./my_model/GRU_N='+str(n)+'_multilayer.hdf5')
+    #position_hat_1 = model_1.predict(x_test_ready_2)
+    #position_hat_2 = model_2.predict(x_test_ready_2)
+    ##########            RMSE                  ###########
+    position_hat_3 = model_3.predict(x_test_ready_2_rnn)
+    position_hat_4 = model_4.predict(x_test_ready_2_rnn)
+    position_hat_5 = model_5.predict(x_test_ready_2_rnn)
+
+    
+    ##########            RMSE                  ###########
+    Kalman_RMSE = 0
+    DeepLearning_RMSE_1 = 0
+    DeepLearning_RMSE_2 = 0
+    LSTM_only_RMSE=0
+    LSTM_multi_RMSE=0
+    GRU_multi_RMSE=0
+    for k in range(len(y_test[0])-n):
+        Kalman_RMSE += (x_test[0,n:-1][k]-hat_x[0,n:][k])**2
+        #DeepLearning_RMSE_1 += (x_test[0,n:-1][k]-position_hat_1[k])**2
+        #DeepLearning_RMSE_2 += (x_test[0,n:-1][k]-position_hat_2[k])**2
+        LSTM_only_RMSE += (x_test[0,n:-1][k]-position_hat_3[k])**2
+        LSTM_multi_RMSE += (x_test[0,n:-1][k]-position_hat_4[k])**2
+        GRU_multi_RMSE += (x_test[0,n:-1][k]-position_hat_5[k])**2
+        
+    Kalman_RMSE = (Kalman_RMSE/(len(y_test[0])-n))**0.5
+    #DeepLearning_RMSE_1 = (DeepLearning_RMSE_1/(len(y_test[0])-n))**0.5
+    #DeepLearning_RMSE_2 = (DeepLearning_RMSE_2/(len(y_test[0])-n))**0.5
+    LSTM_only_RMSE = (LSTM_only_RMSE/(len(y_test[0])-n))**0.5
+    LSTM_multi_RMSE = (LSTM_multi_RMSE/(len(y_test[0])-n))**0.5
+    GRU_multi_RMSE = (GRU_multi_RMSE/(len(y_test[0])-n))**0.5
+    Kalman_RMSE_list_N.append(Kalman_RMSE)
+    #DeepLearning_RMSE_list_N_1.append(DeepLearning_RMSE_1[0])
+    #DeepLearning_RMSE_list_N_2.append(DeepLearning_RMSE_2[0])
+    LSTM_only_RMSE_list.append(LSTM_only_RMSE)
+    LSTM_multi_RMSE_list.append(LSTM_multi_RMSE)
+    GRU_multi_RMSE_list.append(GRU_multi_RMSE)
+
+more = []
+for c in range(len(Kalman_RMSE_list_N)):
+    if Kalman_RMSE_list_N[c]==min(Kalman_RMSE_list_N[c],LSTM_only_RMSE_list[c],LSTM_multi_RMSE_list[c],GRU_multi_RMSE_list[c]):
+        more.append('KalmanFilter Good')
+#    elif DeepLearning_RMSE_list_N_1[c]==min(Kalman_RMSE_list_N[c],DeepLearning_RMSE_list_N_1[c],DeepLearning_RMSE_list_N_2[c],LSTM_only_RMSE_list[c],LSTM_multi_RMSE_list[c],GRU_multi_RMSE_list[c]):
+#        more.append('DeepLearning_1 Good')
+    elif LSTM_only_RMSE_list[c]==min(Kalman_RMSE_list_N[c],LSTM_only_RMSE_list[c],LSTM_multi_RMSE_list[c],GRU_multi_RMSE_list[c]):
+        more.append('LSTM_only Good')
+    elif LSTM_multi_RMSE_list[c]==min(Kalman_RMSE_list_N[c],LSTM_only_RMSE_list[c],LSTM_multi_RMSE_list[c],GRU_multi_RMSE_list[c]):
+        more.append('LSTM_multi Good')
+    elif GRU_multi_RMSE_list[c]==min(Kalman_RMSE_list_N[c],LSTM_only_RMSE_list[c],LSTM_multi_RMSE_list[c],GRU_multi_RMSE_list[c]):
+        more.append('GRU_multi Good')
+#    else :
+#        more.append('DeepLearning_2 Good')
+result_dic = {
+    'N': n_list,
+    'Kalman RMSE':Kalman_RMSE_list_N,
+    #'DeepLearning RMSE_1':DeepLearning_RMSE_list_N_1,
+    #'DeepLearning RMSE_2':DeepLearning_RMSE_list_N_2,
+    'LSTM_only':LSTM_only_RMSE_list,
+    'LSTM_multi':LSTM_multi_RMSE_list,
+    'GRU_multi':GRU_multi_RMSE_list,
+    'Better':more
+}
+df_N = pd.DataFrame(result_dic)
+print("Best case DeepLearning")
+#print(df_N.iloc[DeepLearning_RMSE_list_N_1.index(min(DeepLearning_RMSE_list_N_1))])
+#print(df_N.iloc[DeepLearning_RMSE_list_N_2.index(min(DeepLearning_RMSE_list_N_2))])
+print(df_N.iloc[LSTM_only_RMSE_list.index(min(LSTM_only_RMSE_list))])
+print(df_N.iloc[LSTM_multi_RMSE_list.index(min(LSTM_multi_RMSE_list))])
+print(df_N.iloc[GRU_multi_RMSE_list.index(min(GRU_multi_RMSE_list))])
+df_N.to_csv('Dense.csv')
+df_N
