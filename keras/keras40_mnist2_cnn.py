@@ -45,9 +45,9 @@ model.add(Dense(32,activation='relu'))
 model.add(Dense(16,activation='relu'))
 model.add(Dense(10,activation='softmax'))
 model.compile(loss = 'categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.fit(x_train,y_train,validation_split = 0.2,epochs=300,verbose=1,batch_size=16,callbacks=[es,cp])
+model.fit(x_train,y_train,validation_split = 0.2,epochs=300,verbose=1,batch_size=32,callbacks=[es,cp])
 
-loss = model.evaluate(x_test,y_test,batch_size=8)
+loss = model.evaluate(x_test,y_test,batch_size=32)
 y_predict = model.predict(x_test)
 y_predict = np.argmax(y_predict,axis=-1)
 
@@ -57,4 +57,18 @@ print('accuracy : ',loss[1])
 
 
 #0.985 이상
+'''
+313/313 [==============================] - 2s 5ms/step - loss: 0.0931 - accuracy: 0.9874
+실제 :  7 예상 :  7
+실제 :  2 예상 :  2
+실제 :  1 예상 :  1
+실제 :  0 예상 :  0
+실제 :  4 예상 :  4
+실제 :  1 예상 :  1
+실제 :  4 예상 :  4
+실제 :  9 예상 :  9
+실제 :  5 예상 :  5
+실제 :  9 예상 :  9
+accuracy :  0.9873999953269958
+'''
 
