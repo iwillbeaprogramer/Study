@@ -54,5 +54,8 @@ print('loss : ',loss[1])
 '''
 accuracy :  0.9824561476707458
 
+dropout
+loss :  0.9298245906829834
+
 
 '''

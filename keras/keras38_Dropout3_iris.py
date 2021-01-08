@@ -57,6 +57,8 @@ print("틀린갯수 : {}/{}".format(count,len(y_prediction)))
 
 '''
 accuracy :  0.9666666388511658
+dropout
+s/step - loss: 0.0862 - accuracy: 0.9667
 '''
 
 
