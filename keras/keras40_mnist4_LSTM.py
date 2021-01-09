@@ -6,23 +6,16 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-
 from tensorflow.keras.datasets import mnist
-
-(x_train,y_train),(x_test,y_test) = mnist.load_data()
-
-x_train = x_train.reshape(60000,28*,28).astype('float32')/255.
-x_test = x_test.reshape(-1,28,28)/255.
-# (x_test.reshape(x_test[0],x_test.shape[1],x_test.shape[2],1))
-
 from tensorflow.keras.utils import to_categorical
-
-
-
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D,MaxPooling2D,Dense,Flatten,Dropout,LSTM
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
+(x_train,y_train),(x_test,y_test) = mnist.load_data()
+x_train = x_train.reshape(60000,28,28).astype('float32')/255.
+x_test = x_test.reshape(-1,28,28)/255.
+# (x_test.reshape(x_test[0],x_test.shape[1],x_test.shape[2],1))
 es = EarlyStopping(monitor='loss',patience=10)
 y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
@@ -30,10 +23,7 @@ y_test = to_categorical(y_test)
 model = Sequential()
 model.add(LSTM(512,input_shape = (28,28)))
 model.add(Dense(256,activation='relu'))
-model.add(Dense(128,activation='relu'))
 model.add(Dense(64,activation='relu'))
-model.add(Dense(32,activation='relu'))
-model.add(Dense(16,activation='relu'))
 model.add(Dense(10,activation='softmax'))
 model.compile(loss = 'categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 model.fit(x_train,y_train,validation_split = 0.2,epochs=1,verbose=1,batch_size=32,callbacks=[es])
