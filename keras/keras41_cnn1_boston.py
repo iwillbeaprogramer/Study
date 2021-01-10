@@ -28,7 +28,7 @@ x_test = x_test.reshape(-1,13,1,1)
 x_val = x_val.reshape(-1,13,1,1)
 
 model = Sequential()
-model.add(Conv2D(filters = 128,kernel_size=(2,1),input_shape = (13,1,1)))
+model.add(Conv2D(filters = 128,kernel_size=(1,1),input_shape = (13,1,1)))
 model.add(MaxPooling2D(pool_size=1))
 model.add(Flatten())
 model.add(Dense(64,activation='relu'))
@@ -60,7 +60,8 @@ LSTM
 rmse :  3.8205305080023364
 r2 :  0.8176361801219632
 
+
 CNN
-rmse :  3.9031809150322885
-r2 :  0.6623068498248086
+rmse :  3.2644147587006778
+r2 :  0.8840254085919572
 '''
