@@ -16,6 +16,10 @@ activity_regularizer: Regularizer function applied to the output of the layer (i
 kernel_constraint: Constraint function applied to the kernel matrix (see keras.constraints).
 bias_constraint: Constraint function applied to the bias vector (see keras.constraints).
 
+imshow
+plt.imshow(x_train[0],'gray')
+plt.show()
+
 과적합 줄이기
 # 1. 훈련 데이터를 늘린다
 # 2. 규제 피처를 줄인다.
