@@ -44,6 +44,12 @@ print('loss : {}    accuracy : {}'.format(loss[0],loss[1]))
 
 
 '''
+CNN
+loss : 1.019891619682312    accuracy : 0.6223
 
+DNN
+loss : 3.381682872772217    accuracy : 0.44920000433921814
 
+LSTM
+loss : 2.302645444869995    accuracy : 0.10000000149011612
 '''

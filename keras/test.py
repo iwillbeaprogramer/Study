@@ -1,61 +1,85 @@
-# 인공지능계의 hello world mnist
+"""
+Adapted from keras example cifar10_cnn.py
+Train ResNet-18 on the CIFAR10 small images dataset.
+GPU run command with Theano backend (with TensorFlow, the GPU is automatically used):
+    THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python cifar10.py
+"""
+from __future__ import print_function
+from keras.datasets import cifar10
+from keras.preprocessing.image import ImageDataGenerator
+from keras.utils import np_utils
+from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping
 
 import numpy as np
-import matplotlib.pyplot as plt
-
-from tensorflow.keras.datasets import mnist
-
-(x_train,y_train),(x_test,y_test) = mnist.load_data()
-print(x_train.shape,y_train.shape) # (60000,28,28)  (60000,)
-print(x_test.shape,y_test.shape) # (10000, 28, 28) (10000,)
-
-print(x_train[0])
-print(y_train[0])
-
-print(x_train[0].shape)
-
-x_train = x_train.reshape(60000,28,28,1).astype('float32')/255.
-x_test = x_test.reshape(-1,28,28,1)/255.
-# (x_test.reshape(x_test[0],x_test.shape[1],x_test.shape[2],1))
-
-from tensorflow.keras.utils import to_categorical
+import resnet
 
 
+lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=0.5e-6)
+early_stopper = EarlyStopping(min_delta=0.001, patience=10)
+csv_logger = CSVLogger('resnet18_cifar10.csv')
 
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D,MaxPooling2D,Dense,Flatten,Dropout
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+batch_size = 32
+nb_classes = 10
+nb_epoch = 200
+data_augmentation = True
 
-filepath = './model/keras40_mnist2.h5'
-cp = ModelCheckpoint(filepath = './model/keras40_mnist2.h5', monitor='val_loss',save_best_only = True)
-es = EarlyStopping(monitor='loss',patience=10)
-y_train = to_categorical(y_train)
-y_test = to_categorical(y_test)
+# input image dimensions
+img_rows, img_cols = 32, 32
+# The CIFAR10 images are RGB.
+img_channels = 3
 
-model = Sequential()
-model.add(Conv2D(filters = 256,kernel_size = (2,2),padding='same',strides = 1,input_shape=(28,28,1)))
-model.add(MaxPooling2D(pool_size=2))
-model.add(Dropout(0.5))
-model.add(Conv2D(128,kernel_size=(2,2)))
-model.add(MaxPooling2D(pool_size=2))
-model.add(Dropout(0.25))
-model.add(Flatten())
-model.add(Dense(64,activation='relu'))
-model.add(Dense(32,activation='relu'))
-model.add(Dense(16,activation='relu'))
-model.add(Dense(10,activation='softmax'))
-model.compile(loss = 'categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.fit(x_train,y_train,validation_split = 0.2,epochs=300,verbose=1,batch_size=16,callbacks=[es])
+# The data, shuffled and split between train and test sets:
+(X_train, y_train), (X_test, y_test) = cifar10.load_data()
 
-loss = model.evaluate(x_test,y_test,batch_size=16)
-model.save('./model/keras40_mnist2.h5')
-y_predict = model.predict(x_test)
-y_predict = np.argmax(y_predict,axis=-1)
+# Convert class vectors to binary class matrices.
+Y_train = np_utils.to_categorical(y_train, nb_classes)
+Y_test = np_utils.to_categorical(y_test, nb_classes)
 
-for i in range(10):
-    print('실제 : ',np.argmax(y_test[i]),'예상 : ',y_predict[i])
-print('accuracy : ',loss[1])
+X_train = X_train.astype('float32')
+X_test = X_test.astype('float32')
 
+# subtract mean and normalize
+mean_image = np.mean(X_train, axis=0)
+X_train -= mean_image
+X_test -= mean_image
+X_train /= 128.
+X_test /= 128.
 
-#0.985 이상
+model = resnet.ResnetBuilder.build_resnet_18((img_channels, img_rows, img_cols), nb_classes)
+model.compile(loss='categorical_crossentropy',
+              optimizer='adam',
+              metrics=['accuracy'])
 
+if not data_augmentation:
+    print('Not using data augmentation.')
+    model.fit(X_train, Y_train,
+              batch_size=batch_size,
+              nb_epoch=nb_epoch,
+              validation_data=(X_test, Y_test),
+              shuffle=True,
+              callbacks=[lr_reducer, early_stopper, csv_logger])
+else:
+    print('Using real-time data augmentation.')
+    # This will do preprocessing and realtime data augmentation:
+    datagen = ImageDataGenerator(
+        featurewise_center=False,  # set input mean to 0 over the dataset
+        samplewise_center=False,  # set each sample mean to 0
+        featurewise_std_normalization=False,  # divide inputs by std of the dataset
+        samplewise_std_normalization=False,  # divide each input by its std
+        zca_whitening=False,  # apply ZCA whitening
+        rotation_range=0,  # randomly rotate images in the range (degrees, 0 to 180)
+        width_shift_range=0.1,  # randomly shift images horizontally (fraction of total width)
+        height_shift_range=0.1,  # randomly shift images vertically (fraction of total height)
+        horizontal_flip=True,  # randomly flip images
+        vertical_flip=False)  # randomly flip images
+
+    # Compute quantities required for featurewise normalization
+    # (std, mean, and principal components if ZCA whitening is applied).
+    datagen.fit(X_train)
+
+    # Fit the model on the batches generated by datagen.flow().
+    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=batch_size),
+                        steps_per_epoch=X_train.shape[0] // batch_size,
+                        validation_data=(X_test, Y_test),
+                        epochs=nb_epoch, verbose=1, max_q_size=100,
+                        callbacks=[lr_reducer, early_stopper, csv_logger])
