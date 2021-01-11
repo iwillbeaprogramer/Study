@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.datasets import cifar10
 from sklearn.preprocessing import OneHotEncoder
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense,Conv2D,MaxPooling2D,Flatten,LSTM
+from tensorflow.keras.layers import Dense,Conv2D,MaxPooling2D,Flatten,LSTM,Dropout
 from tensorflow.keras.callbacks import EarlyStopping
 
 
@@ -49,6 +49,11 @@ print('loss : {}    accuracy : {}'.format(loss[0],loss[1]))
 
 '''
 CNN
-loss : 1.019891619682312    accuracy : 0.8964999914169312
+loss : 1.019891619682312    accuracy : 0.6223
 
+DNN
+loss : 3.381682872772217    accuracy : 0.44920000433921814
+
+LSTM
+loss : 2.302645444869995    accuracy : 0.10000000149011612
 '''

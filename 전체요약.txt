@@ -1,3 +1,6 @@
+Tensorboard
+graph 폴더에서 tensorboard --logdir=.
+
 conv2D 변수들
 filters: Integer, the dimensionality of the output space (i.e. the number of output filters in the convolution).
 kernel_size: An integer or tuple/list of 2 integers, specifying the height and width of the 2D convolution window. Can be a single integer to specify the same value for all spatial dimensions.
@@ -32,6 +35,7 @@ LSTM	(행, 열, 몇) <- 3차원	(열, 몇)  <- 2차원
 CNN	(행, h, w, f)   <- 4차원	(h, w, f)  <- 3차원
 
 <LSTM>
+이거 짜를때 매우중요!!!! (전체갯수,기타,컬럼개수의 배수 )    -> 이게 베스트
 4x(1+1+10)x10
 첫번쨰 1은 인풋딤 두번째일은 바이어스 3번쨰는 10개가 돌아오는거
 (행,열,몇개식 짜르는지)
