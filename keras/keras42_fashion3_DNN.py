@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.datasets import fashion_mnist
 from sklearn.preprocessing import OneHotEncoder
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense,Conv2D,MaxPooling2D,Flatten
+from tensorflow.keras.layers import Dense
 from tensorflow.keras.callbacks import EarlyStopping
 
 es = EarlyStopping(monitor='loss',patience = 10)
@@ -12,17 +12,17 @@ es = EarlyStopping(monitor='loss',patience = 10)
 #  (60000, 28, 28) (60000,)
 #  (10000, 28, 28) (10000,)
 
-x_train = x_train.reshape(60000,28,28,1).astype('float32')/255
-x_test= x_test.reshape(10000,28,28,1).astype('float32')/255
+x_train = x_train.reshape(60000,28*28).astype('float32')/255
+x_test= x_test.reshape(10000,28*28).astype('float32')/255
 
 onehot = OneHotEncoder()
 y_train = onehot.fit_transform(y_train.reshape(-1,1)).toarray()
 y_test = onehot.transform(y_test.reshape(-1,1)).toarray()
 print(y_test.shape)
 model = Sequential()
-model.add(Conv2D(filters = 256,kernel_size = 2, strides=1 , input_shape=(28,28,1),padding='valid'))
-model.add(MaxPooling2D(pool_size=2))
-model.add(Flatten())
+model.add(Dense(1024,activation='relu',input_dim=28*28))
+model.add(Dense(512,activation='relu'))
+model.add(Dense(256,activation='relu'))
 model.add(Dense(128,activation='relu'))
 model.add(Dense(64,activation='relu'))
 model.add(Dense(32,activation='relu'))
@@ -51,4 +51,5 @@ loss : 1.501900315284729    accuracy : 0.8668000102043152
 
 LSTM
 loss : 2.3025221824645996    accuracy : 0.10000000149011612
+
 '''
