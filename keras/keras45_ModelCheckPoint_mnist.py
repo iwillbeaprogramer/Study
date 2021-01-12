@@ -51,13 +51,13 @@ plt.xlabel('epoch')
 plt.legend(loc='upper right')
 
 plt.subplot(2,1,2)
-plt.plot(hist.history['accuracy'],marker='.',c='red',label='accuracy')
-plt.plot(hist.history['val_accuracy'],marker='.',c='blue',label='accuracy')
+plt.plot(hist.history['accuracy'],marker='.',c='red')
+plt.plot(hist.history['val_accuracy'],marker='.',c='blue')
 plt.grid()
 plt.title('Accuracy')
 plt.ylabel('loss')
 plt.xlabel('epoch')
-plt.legend(loc='upper right')
+plt.legend(['accuracy','val_accuracy'],loc='upper right')
 plt.show()
 
 
