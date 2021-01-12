@@ -22,7 +22,7 @@ y=datasets[:,-1]
 print(x.shape,y.shape)
 
 # 2
-model = load_model('./model/save_keras35.h5')
+model = load_model('../data/h5/save_keras35.h5')
 model.add(Dense(5,name='123123'))
 model.add(Dense(1,name='1231234'))
 

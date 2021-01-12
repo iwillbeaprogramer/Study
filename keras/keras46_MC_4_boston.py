@@ -29,7 +29,7 @@ x_val = scaler.transform(x_val)
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
-modelpath = './modelCheckpoint/k46_boston_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath = '../data/modelCheckpoint/k46_boston_{epoch:02d}-{val_loss:.4f}.hdf5'
 early_stopping = EarlyStopping(monitor = 'val_loss', patience = 20,mode = 'auto')
 cp = ModelCheckpoint(filepath=modelpath,monitor='val_loss',mode='auto')
 

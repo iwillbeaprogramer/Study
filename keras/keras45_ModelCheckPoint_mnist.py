@@ -11,7 +11,7 @@ x_train = x_train.reshape(60000,28,28,1).astype('float32')/255.
 x_test = x_test.reshape(-1,28,28,1)/255.
 
 
-modelpath = './modelCheckpoint/k45_mnist_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath = '../data/modelcheckpoint/k45_mnist_{epoch:02d}-{val_loss:.4f}.hdf5'
 cp = ModelCheckpoint(filepath = modelpath, monitor='val_loss',save_best_only = True, mode = 'auto')
 es = EarlyStopping(monitor='val_loss',patience=10)
 y_train = to_categorical(y_train)

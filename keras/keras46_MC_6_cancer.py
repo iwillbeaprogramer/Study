@@ -22,7 +22,7 @@ x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 x_val = scaler.transform(x_val)
 
-modelpath = './modelCheckpoint/k46_cancer_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath = '../data/modelCheckpoint/k46_cancer_{epoch:02d}-{val_loss:.4f}.hdf5'
 cp = ModelCheckpoint(monitor='val_loss',filepath=modelpath,save_best_only=True)
 early_stopping = EarlyStopping(monitor='val_loss',patience=25,mode='auto')
 

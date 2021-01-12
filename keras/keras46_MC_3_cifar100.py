@@ -7,7 +7,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense,Conv2D,MaxPooling2D,Flatten,LSTM,Dropout
 from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
 
-modelpath = './modelCheckpoint/k46_cifar100_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath = '../data/modelCheckpoint/k46_cifar100_{epoch:02d}-{val_loss:.4f}.hdf5'
 cp = ModelCheckpoint(monitor='val_loss',mode='auto',save_best_only=True,filepath=modelpath)
 es = EarlyStopping(monitor='val_loss',patience = 10)
 (x_train,y_train),(x_test,y_test) = cifar100.load_data()

@@ -6,7 +6,7 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
 import matplotlib.pyplot as plt
 
-modelpath = './modelCheckpoint/k46_wine_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath = '../data/modelCheckpoint/k46_wine_{epoch:02d}-{val_loss:.4f}.hdf5'
 cp = ModelCheckpoint(filepath=modelpath,monitor='val_loss',save_best_only=True)
 early_stopping = EarlyStopping(monitor='val_loss',patience=10)
 

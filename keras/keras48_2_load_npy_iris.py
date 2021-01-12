@@ -9,8 +9,8 @@ from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
 from tensorflow.keras.utils import to_categorical
 import matplotlib.pyplot as plt
 
-x = np.load('./data/iris_x.npy')
-y = np.load('./data/iris_y.npy')
+x = np.load('../data/npy/iris_x.npy')
+y = np.load('../data/npy/iris_y.npy')
 y = to_categorical(y)
 x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2)
 x_train,x_val,y_train,y_val = train_test_split(x_train,y_train,test_size=0.2)

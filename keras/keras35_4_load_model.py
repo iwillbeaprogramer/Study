@@ -4,7 +4,7 @@ from tensorflow.keras.models import Sequential
 a = np.array(range(1,11))
 
 from tensorflow.keras.models import load_model
-model = load_model('./model/save_keras35.h5')
+model = load_model('../data/h5/save_keras35.h5')
 
 def split_x(seq,size):
     aaa=[]

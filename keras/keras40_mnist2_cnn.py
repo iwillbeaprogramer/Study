@@ -26,8 +26,8 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D,MaxPooling2D,Dense,Flatten,Dropout
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
-filepath = './model/keras40_mnist2.h5'
-cp = ModelCheckpoint(filepath = './model/keras40_mnist2.h5', monitor='val_loss',save_best_only = True)
+filepath = './data/h5/keras40_mnist2.h5'
+cp = ModelCheckpoint(filepath = './data/h5/keras40_mnist2.h5', monitor='val_loss',save_best_only = True)
 es = EarlyStopping(monitor='loss',patience=10)
 y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
