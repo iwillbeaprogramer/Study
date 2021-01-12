@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 # from keras.utils.np_utils import to_categorical
 
 datasets = load_iris()
-x = np.load('./data/iris_x.npy')
-y = np.load('./data/iris_y.npy')
+x = np.load('../data/npy/iris_x.npy')
+y = np.load('../data/npy/iris_y.npy')
 y = to_categorical(y)
 #x = datasets.data
 #y = to_categorical(datasets.target)
@@ -28,7 +28,7 @@ x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 x_val = scaler.transform(x_val)
 
-modelpath = './modelCheckpoint/k46_iris_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath = '../data/modelCheckpoint/k46_iris_{epoch:02d}-{val_loss:.4f}.hdf5'
 cp = ModelCheckpoint(monitor='val_loss',filepath=modelpath,save_best_only=True)
 early_stopping = EarlyStopping(monitor='val_loss',patience=10,mode='auto')
 

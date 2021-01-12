@@ -8,18 +8,18 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D,MaxPooling2D,Dense,Flatten,Dropout
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
-x_train = np.load('./data/mnist_x_train.npy') 
-x_test = np.load('./data/mnist_x_test.npy') 
-y_train = np.load('./data/mnist_y_train.npy') 
-y_test = np.load('./data/mnist_y_test.npy') 
+x_train = np.load('../data/npy/mnist_x_train.npy') 
+x_test = np.load('../data/npy/mnist_x_test.npy') 
+y_train = np.load('../data/npy/mnist_y_train.npy') 
+y_test = np.load('../data/npy/mnist_y_test.npy') 
 x_train = x_train.reshape(60000,28,28,1).astype('float32')/255.
 x_test = x_test.reshape(-1,28,28,1)/255.
 # (x_test.reshape(x_test[0],x_test.shape[1],x_test.shape[2],1))
-modelpath = './modelCheckpoint/k45_mnist_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath = '../data/modelCheckpoint/k45_mnist_{epoch:02d}-{val_loss:.4f}.hdf5'
 cp = ModelCheckpoint(filepath = modelpath, monitor='val_loss',save_best_only = True, mode = 'auto')
 
 
-filepath = './model/keras40_mnist2.h5'
+filepath = '../data/h5/keras40_mnist2.h5'
 cp = ModelCheckpoint(filepath = './model/keras40_mnist2.h5', monitor='val_loss',save_best_only = True)
 es = EarlyStopping(monitor='loss',patience=10)
 y_train = to_categorical(y_train)

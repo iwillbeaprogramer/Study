@@ -13,8 +13,8 @@ np.random.seed(0)
 #tf.set_random_seed(0)
 
 datasets = load_diabetes()
-x = np.load('./data/diabetes_x.npy')
-y = np.load('./data/diabetes_y.npy')
+x = np.load('../data/npy/diabetes_x.npy')
+y = np.load('../data/npy/diabetes_y.npy')
 #x=datasets.data
 #y=datasets.target
 x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2,random_state=45)
@@ -27,7 +27,7 @@ x_train = x_scaler.transform(x_train)
 x_test = x_scaler.transform(x_test)
 x_val = x_scaler.transform(x_val)
 print(x_test[0:5,:])
-modelpath = './modelCheckpoint/k46_diabets_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath = '../data/modelCheckpoint/k46_diabets_{epoch:02d}-{val_loss:.4f}.hdf5'
 cp = ModelCheckpoint(filepath=modelpath,monitor='val_loss',save_best_only=True)
 early_stopping =EarlyStopping(monitor='val_loss',patience=70)
 

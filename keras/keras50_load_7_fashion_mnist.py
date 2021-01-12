@@ -7,13 +7,13 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense,Conv2D,MaxPooling2D,Flatten
 from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
 
-modelpath = './modelCheckpoint/k46_fashion_mnist_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath = '../data/modelCheckpoint/k46_fashion_mnist_{epoch:02d}-{val_loss:.4f}.hdf5'
 cp = ModelCheckpoint(filepath = modelpath, monitor='val_loss',save_best_only = True, mode = 'auto')
 es = EarlyStopping(monitor='loss',patience = 10)
-x_train = np.load('./data/fmnist_x_train.npy') 
-x_test = np.load('./data/fmnist_x_test.npy') 
-y_train = np.load('./data/fmnist_y_train.npy') 
-y_test = np.load('./data/fmnist_y_test.npy') 
+x_train = np.load('../data/npy/fmnist_x_train.npy') 
+x_test = np.load('../data/npy/fmnist_x_test.npy') 
+y_train = np.load('../data/npy/fmnist_y_train.npy') 
+y_test = np.load('../data/npy/fmnist_y_test.npy') 
 
 x_train = x_train.reshape(60000,28,28,1).astype('float32')/255
 x_test= x_test.reshape(10000,28,28,1).astype('float32')/255

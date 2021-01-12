@@ -8,8 +8,8 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
 
 datasets = load_breast_cancer()
-x = np.load('./data/cancer_x.npy')
-y = np.load('./data/cancer_y.npy')
+x = np.load('../data/npy/cancer_x.npy')
+y = np.load('../data/npy/cancer_y.npy')
 #x = datasets.data
 #y = datasets.target
 print(x.shape) # (569,30)
@@ -24,7 +24,7 @@ x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 x_val = scaler.transform(x_val)
 
-modelpath = './modelCheckpoint/k46_cancer_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath = '../data/modelCheckpoint/k46_cancer_{epoch:02d}-{val_loss:.4f}.hdf5'
 cp = ModelCheckpoint(monitor='val_loss',filepath=modelpath,save_best_only=True)
 early_stopping = EarlyStopping(monitor='val_loss',patience=25,mode='auto')
 
