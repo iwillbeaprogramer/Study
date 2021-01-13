@@ -8,7 +8,7 @@ from tensorflow.keras.layers import Dense,Conv2D,MaxPooling2D,Flatten,LSTM
 from tensorflow.keras.callbacks import EarlyStopping
 
 
-es = EarlyStopping(monitor='loss',patience = 10)
+es = EarlyStopping(monitor='loss',patience = 50)
 (x_train,y_train),(x_test,y_test) = cifar100.load_data()
 #  (50000, 32, 32, 3) (50000, 1)
 #  (10000, 32, 32, 3) (10000, 1)
@@ -44,9 +44,10 @@ print('loss : {}    accuracy : {}'.format(loss[0],loss[1]))
 
 '''
 CNN
-
+loss : 5.747400283813477    accuracy : 0.2978000044822693
 DNN
-
+loss : 4.605535984039307    accuracy : 0.009999999776482582
 LSTM
+loss : 10.353824615478516    accuracy : 0.21389999985694885
 
 '''
