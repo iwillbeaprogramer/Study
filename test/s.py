@@ -56,12 +56,13 @@ datasets.to_csv('csv.csv')
 datasets = pd.read_csv('csv.csv',index_col=0)
 np.save("../data/h5/삼성전자.npy",arr=datasets)
 
-#열제거
+# 열제거
 datasets.drop(['거래량', '금액(백만)','신용비','외국계','프로그램'], axis='columns', inplace=True)
 
 #y데이터 생성
 size=20
-col=8
+col=6
+
 
 y = datasets.iloc[size-1:,3].values #(2378,)
 
@@ -80,16 +81,13 @@ x_train=x_train.reshape(-1,size,col).astype('float32')
 x_test=x_test.reshape(-1,size,col).astype('float32')
 x_val=x_val.reshape(-1,size,col).astype('float32')
 
-modelpath = "../data/h5/Samsung_best_model_col{}_original.h5".format(col)
+modelpath = "../data/h5/Samsung_best_model_s_col{}.h5".format(col)
 es = EarlyStopping(monitor = 'val_loss',patience=200)
 cp = ModelCheckpoint(monitor = 'val_loss',filepath = modelpath,save_best_only=True)
 model = Sequential()
-model.add(LSTM(512,activation='relu',input_shape=(x_train.shape[1],x_train.shape[2])))
-model.add(Dropout(0.25))
+model.add(LSTM(32,activation='relu',input_shape=(x_train.shape[1],x_train.shape[2])))
 model.add(Dense(1024,activation='relu'))
-model.add(Dropout(0.25))
 model.add(Dense(512,activation='relu'))
-model.add(Dropout(0.25))
 model.add(Dense(256,activation='relu'))
 model.add(Dense(128,activation='relu'))
 model.add(Dense(64,activation='relu'))
