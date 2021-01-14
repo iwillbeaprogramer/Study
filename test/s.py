@@ -54,14 +54,16 @@ datasets.iloc[662:,5] = datasets.iloc[662:,5]*50
 datasets = datasets.iloc[::-1,:]
 datasets.to_csv('csv.csv')
 datasets = pd.read_csv('csv.csv',index_col=0)
-np.save("../data/h5/삼성전자.npy",arr=datasets)
 
 # 열제거
-datasets.drop(['거래량', '금액(백만)','신용비','외국계','프로그램'], axis='columns', inplace=True)
+datasets.drop(['거래량', '금액(백만)','신용비','외국계','외인비','프로그램'], axis='columns', inplace=True)
+np.save('../data/h5/삼성S.npy',arr=datasets.values)
 
+datasets["고가-저가"]=datasets['고가']-datasets['저가']
 #y데이터 생성
 size=20
-col=6
+col=9
+print(datasets)
 
 
 y = datasets.iloc[size-1:,3].values #(2378,)
@@ -81,7 +83,7 @@ x_train=x_train.reshape(-1,size,col).astype('float32')
 x_test=x_test.reshape(-1,size,col).astype('float32')
 x_val=x_val.reshape(-1,size,col).astype('float32')
 
-modelpath = "../data/h5/Samsung_best_model_s_col{}.h5".format(col)
+modelpath = "../data/h5/Samsung_best_model_s_col{}_01_14.h5".format(col)
 es = EarlyStopping(monitor = 'val_loss',patience=200)
 cp = ModelCheckpoint(monitor = 'val_loss',filepath = modelpath,save_best_only=True)
 model = Sequential()
@@ -97,7 +99,7 @@ model.add(Dense(8,activation='relu'))
 model.add(Dense(1))
 model.compile(loss = 'mse',optimizer = 'adam')
 
-hist = model.fit(x_train,y_train,validation_data=(x_val,y_val),epochs=10000,batch_size=8,verbose=1,callbacks=[es,cp])
+hist = model.fit(x_train,y_train,validation_data=(x_val,y_val),epochs=10000,batch_size=4,verbose=1,callbacks=[es,cp])
 
 plt.rc('font', family='Malgun Gothic')
 plt.plot(hist.history['loss'])
@@ -108,7 +110,7 @@ plt.xlabel('epochs')
 plt.legend(['train_loss','val_loss'])
 plt.show()
 
-loss = model.evaluate(x_test,y_test,batch_size=8)
+loss = model.evaluate(x_test,y_test,batch_size=4)
 print("loss : ",loss )
 
 

@@ -1,14 +1,16 @@
 import numpy as np
 import pandas as pd
 from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential,load_model
 from tensorflow.keras.layers import Dense,LSTM,Conv1D,MaxPool1D,Dropout,Flatten
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score,mean_squared_error
+from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
+from tensorflow.keras.models import Sequential,load_model
 
-# 함수정의
+
+model = load_model('Samsung_best_model_s_col6.h5')
 def split_x(seq,size,col):
     aaa=[]
     for i in range(len(seq)-size+1):
@@ -33,7 +35,7 @@ def str_to_float(input_str):
         return -sum
 
 
-datasets = pd.read_csv("./test/삼성전자.csv",encoding='cp949',index_col=0)
+datasets = pd.read_csv("삼성전자.csv",encoding='cp949',index_col=0)
 #전처리 
 #1-1 분할(결측치가 있는 3개의행 제거)
 datasets_1 = datasets.iloc[:662,:]
@@ -54,22 +56,14 @@ datasets.iloc[662:,5] = datasets.iloc[662:,5]*50
 datasets = datasets.iloc[::-1,:]
 datasets.to_csv('csv.csv')
 datasets = pd.read_csv('csv.csv',index_col=0)
-np.save("../data/h5/삼성전자.npy",arr=datasets)
 
-#열추가
-datasets["고가-저가"]=datasets['고가']-datasets['저가']
+# 열제거
+datasets.drop(['거래량', '금액(백만)','신용비','외국계','프로그램'], axis='columns', inplace=True)
 
 #y데이터 생성
-#[시가,고가,저가,종가,등락률,거래량,금액(백만),신용비,개인,기관,외인(수량),외국계,프로그램,외인비,고-저]
-#[   0   1    2    3    4     5      6          7    8    9         10       11    12     13     14]
-print(datasets)
-
-#열제거
-drop_col=['거래량', '금액(백만)','신용비','외국계','프로그램','외인(수량)']
-datasets.drop(drop_col, axis='columns', inplace=True)
-
 size=20
-col=14-len(drop_col)
+col=6
+
 
 y = datasets.iloc[size-1:,3].values #(2378,)
 
@@ -88,40 +82,21 @@ x_train=x_train.reshape(-1,size,col).astype('float32')
 x_test=x_test.reshape(-1,size,col).astype('float32')
 x_val=x_val.reshape(-1,size,col).astype('float32')
 
-modelpath = "../data/h5/Samsung_best_model_col{}_original.h5".format(col)
-es = EarlyStopping(monitor = 'val_loss',patience=200)
-cp = ModelCheckpoint(monitor = 'val_loss',filepath = modelpath,save_best_only=True)
-model = Sequential()
-model.add(LSTM(128,activation='relu',input_shape=(x_train.shape[1],x_train.shape[2])))
-model.add(Dense(1024,activation='relu'))
-model.add(Dropout(0.25))
-model.add(Dense(512,activation='relu'))
-model.add(Dense(256,activation='relu'))
-model.add(Dense(128,activation='relu'))
-model.add(Dense(64,activation='relu'))
-model.add(Dense(32,activation='relu'))
-model.add(Dense(16,activation='relu'))
-model.add(Dense(8,activation='relu'))
-model.add(Dense(1))
-model.compile(loss = 'mse',optimizer = 'adam')
 
-hist = model.fit(x_train,y_train,validation_data=(x_val,y_val),epochs=10000,batch_size=4,verbose=1,callbacks=[es,cp])
 
-plt.rc('font', family='Malgun Gothic')
-plt.plot(hist.history['loss'])
-plt.plot(hist.history['val_loss'])
-plt.title('loss ')
-plt.ylabel('loss')
-plt.xlabel('epochs')
-plt.legend(['train_loss','val_loss'])
-plt.show()
+model = load_model('./Samsung_best_model_s_col6.h5')
 
-loss = model.evaluate(x_test,y_test,batch_size=4)
-print("loss : ",loss )
 y_pred = model.predict(x_test)
+for i in range(1,100,5):
+    print("예상 : {}     실제 : {}".format(round(y_pred[i][0],-2),y_test[i]))
 
+jen_14 = model.predict(x[-20:])
+tomorrow = jen_14[-1][0]
+
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
 rmse = mean_squared_error(y_test,y_pred)**0.5
 r2 = r2_score(y_test,y_pred)
 
 print('rmse : ',rmse,'\tr2 : ',r2)
-
+print("Tomorrow : : ",round(tomorrow,-2))

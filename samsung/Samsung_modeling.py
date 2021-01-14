@@ -5,7 +5,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense,LSTM,Conv1D,MaxPool1D,Dropout,Flatten
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score,mean_squared_error
+from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
 
 # 함수정의
@@ -56,20 +56,12 @@ datasets.to_csv('csv.csv')
 datasets = pd.read_csv('csv.csv',index_col=0)
 np.save("../data/h5/삼성전자.npy",arr=datasets)
 
-#열추가
-datasets["고가-저가"]=datasets['고가']-datasets['저가']
+#열제거
+datasets.drop(['거래량', '금액(백만)','신용비','외국계','프로그램'], axis='columns', inplace=True)
 
 #y데이터 생성
-#[시가,고가,저가,종가,등락률,거래량,금액(백만),신용비,개인,기관,외인(수량),외국계,프로그램,외인비,고-저]
-#[   0   1    2    3    4     5      6          7    8    9         10       11    12     13     14]
-print(datasets)
-
-#열제거
-drop_col=['거래량', '금액(백만)','신용비','외국계','프로그램','외인(수량)']
-datasets.drop(drop_col, axis='columns', inplace=True)
-
 size=20
-col=14-len(drop_col)
+col=8
 
 y = datasets.iloc[size-1:,3].values #(2378,)
 
@@ -92,10 +84,12 @@ modelpath = "../data/h5/Samsung_best_model_col{}_original.h5".format(col)
 es = EarlyStopping(monitor = 'val_loss',patience=200)
 cp = ModelCheckpoint(monitor = 'val_loss',filepath = modelpath,save_best_only=True)
 model = Sequential()
-model.add(LSTM(128,activation='relu',input_shape=(x_train.shape[1],x_train.shape[2])))
+model.add(LSTM(512,activation='relu',input_shape=(x_train.shape[1],x_train.shape[2])))
+model.add(Dropout(0.25))
 model.add(Dense(1024,activation='relu'))
 model.add(Dropout(0.25))
 model.add(Dense(512,activation='relu'))
+model.add(Dropout(0.25))
 model.add(Dense(256,activation='relu'))
 model.add(Dense(128,activation='relu'))
 model.add(Dense(64,activation='relu'))
@@ -105,7 +99,7 @@ model.add(Dense(8,activation='relu'))
 model.add(Dense(1))
 model.compile(loss = 'mse',optimizer = 'adam')
 
-hist = model.fit(x_train,y_train,validation_data=(x_val,y_val),epochs=10000,batch_size=4,verbose=1,callbacks=[es,cp])
+hist = model.fit(x_train,y_train,validation_data=(x_val,y_val),epochs=10000,batch_size=8,verbose=1,callbacks=[es,cp])
 
 plt.rc('font', family='Malgun Gothic')
 plt.plot(hist.history['loss'])
@@ -116,12 +110,7 @@ plt.xlabel('epochs')
 plt.legend(['train_loss','val_loss'])
 plt.show()
 
-loss = model.evaluate(x_test,y_test,batch_size=4)
+loss = model.evaluate(x_test,y_test,batch_size=8)
 print("loss : ",loss )
-y_pred = model.predict(x_test)
 
-rmse = mean_squared_error(y_test,y_pred)**0.5
-r2 = r2_score(y_test,y_pred)
-
-print('rmse : ',rmse,'\tr2 : ',r2)
 
