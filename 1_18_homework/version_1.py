@@ -1,21 +1,21 @@
-size=20
-day=2
-batch_size =64
-epochs = 10000
-modelpath = "./1_18_homework/concat_16_1.h5"
+size=30
+day=3
+batch_size = 2
+epochs = 10000000
+modelpath = "./1_18_homework/concat_16_epoch10000000_patience1500_batch2_size30.h5"
 random_state = 0
-patience = 300
+patience = 1500
 
 import numpy as np
 import pandas as pd
-from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
-from tensorflow.keras.models import Sequential,load_model,Model
-from tensorflow.keras.layers import Dense,LSTM,Conv1D,MaxPool1D,Dropout,Flatten,Input,concatenate,AveragePooling1D,BatchNormalization,GRU
+#from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
+#from tensorflow.keras.models import Sequential,load_model,Model
+#from tensorflow.keras.layers import Dense,LSTM,Conv1D,MaxPool1D,Dropout,Flatten,Input,concatenate,AveragePooling1D,BatchNormalization,GRU
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error,mean_absolute_error
 from sklearn.metrics import r2_score
 
 # 함수정의
@@ -29,7 +29,7 @@ def split_x(seq,size,col):
 def split_y(seq,size,day):
     aaa=[]
     for i in range(len(seq)-size+1):
-        subset = seq[i:(i+size),0:col].astype('float32')
+        subset = seq[i+size : i+size+day,0].astype('float32')
         aaa.append(np.array(subset))
     return np.array(aaa)
 
@@ -81,6 +81,7 @@ drop_col=['거래량', '금액(백만)','신용비','외국계','외인비','프
 datasets_1.drop(drop_col, axis='columns', inplace=True)
 col=14-len(drop_col)
 y_1 = datasets_1.iloc[size+1:,0]
+
 scaler = MinMaxScaler()
 datasets_minmaxed = scaler.fit_transform(datasets_1)
 x_1 = split_x(datasets_minmaxed,size,col)
@@ -116,19 +117,27 @@ x_2_train=x_2_train.reshape(-1,size,col).astype('float32')
 x_1_test=x_1_test.reshape(-1,size,col).astype('float32')
 x_2_test=x_2_test.reshape(-1,size,col).astype('float32')
 
+
 es = EarlyStopping(monitor = 'val_loss',patience=patience)
 cp = ModelCheckpoint(monitor = 'val_loss',filepath = modelpath,save_best_only=True)
 inputs1 = Input(shape=(x_1_train.shape[1],x_1_train.shape[2]))
 lstm1 = LSTM(64,activation='relu')(inputs1)
-dense1 = Dense(1024,activation='relu')(lstm1)
+bat1 = BatchNormalization()(lstm1)
+dense1 = Dense(1024,activation='relu')(bat1)
+do1 = Dropout(0.4)(dense1)
+dense1 = Dense(512,activation='relu')(do1)
 
 inputs2 = Input(shape=(x_2_train.shape[1],x_2_train.shape[2]))
 lstm2 = LSTM(64,activation='relu')(inputs2)
-dense2 = Dense(1024,activation='relu')(lstm2)
+bat2 = BatchNormalization()(lstm2)
+dense2 = Dense(1024,activation='relu')(bat2)
+do2 = Dropout(0.4)(dense2)
+dense2 = Dense(512,activation='relu')(do2)
 
 concat = concatenate([dense1,dense2])
 dense = Dense(512,activation='relu')(concat)
-dense = Dense(256,activation='relu')(dense)
+dropout = Dropout(0.25)(dense)
+dense = Dense(256,activation='relu')(dropout)
 dense = Dense(128,activation='relu')(dense)
 dense = Dense(64,activation='relu')(dense)
 dense = Dense(32,activation='relu')(dense)
@@ -139,12 +148,18 @@ model = Model(inputs=[inputs1,inputs2],outputs=outputs)
 model.compile(loss = 'mse',optimizer = 'adam',metrics=['mae'])
 hist = model.fit([x_1_train,x_2_train],y_1_train,validation_split=0.2,epochs=epochs,batch_size=batch_size,verbose=1,callbacks=[es,cp])
 
+model = load_model('concat_16_epoch10000000_patience1500_batch2_size30.h5')
 y_pred = model.predict([x_1_test,x_2_test])
-for i in range(1,200,7):
+for i in range(1,50,7):
      print("예상_13 : {}     실제 : {}".format(round(y_pred[i][0]),y_1_test[i]))
 
 loss = model.evaluate([x_1_test,x_2_test],y_1_test,batch_size=batch_size)
 rmse = mean_squared_error(y_1_test,y_pred)**0.5
 r2 = r2_score(y_1_test,y_pred)
+mae = mean_absolute_error(y_1_test,y_pred)
 print("loss : ",loss )
-print('rmse : ',rmse,'\tr2 : ',r2)
+print('rmse : ',rmse,'\nr2 : ',r2,'\nmae : ',mae)
+
+model = load_model(modelpath)
+result = model.predict([x_1[-10:],x_2[-10:]])
+print("1월 19일 시가 : {}".format(result[-1]))
