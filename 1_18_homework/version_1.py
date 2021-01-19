@@ -1,16 +1,16 @@
-size=30
-day=3
-batch_size = 2
-epochs = 10000000
-modelpath = "./1_18_homework/concat_16_epoch10000000_patience1500_batch2_size30.h5"
+size=20
+day=2
+batch_size = 4
+epochs = 100000
 random_state = 0
-patience = 1500
+patience = 350
+modelpath = "./1_18_homework/concat_17_epoch{}_batch{}_size{}_day{}_patience{}_layernormX_GRU_SAME.h5".format(epochs,batch_size,size,day,patience)
 
 import numpy as np
 import pandas as pd
-#from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
-#from tensorflow.keras.models import Sequential,load_model,Model
-#from tensorflow.keras.layers import Dense,LSTM,Conv1D,MaxPool1D,Dropout,Flatten,Input,concatenate,AveragePooling1D,BatchNormalization,GRU
+from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
+from tensorflow.keras.models import Sequential,load_model,Model
+from tensorflow.keras.layers import Dense,LSTM,Conv1D,MaxPool1D,Dropout,Flatten,Input,concatenate,AveragePooling1D,BatchNormalization,GRU,LayerNormalization
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
@@ -75,12 +75,15 @@ datasets.iloc[662:,5] = datasets.iloc[662:,5]*50
 datasets = datasets.iloc[::-1,:]
 datasets.to_csv('./1_18_homework/temp_file.csv')
 datasets = pd.read_csv('./1_18_homework/temp_file.csv',index_col=0)
+np.save('1.npy',arr=datasets.values)
 datasets_1 = datasets.iloc[1314:,:]
 datasets_1["고가-저가"]=datasets_1['고가']-datasets_1['저가']
 drop_col=['거래량', '금액(백만)','신용비','외국계','외인비','프로그램','외인(수량)']
 datasets_1.drop(drop_col, axis='columns', inplace=True)
 col=14-len(drop_col)
-y_1 = datasets_1.iloc[size+1:,0]
+np.save('./1_18_homework/1.npy',arr = datasets_1.values)
+datasets = np.load('1.npy')
+y_1 = datasets_1.iloc[size+day-1:,0]
 
 scaler = MinMaxScaler()
 datasets_minmaxed = scaler.fit_transform(datasets_1)
@@ -103,6 +106,8 @@ df = df.iloc[::-1,:]
 df["고가-저가"]=df['고가']-df['저가']
 df.to_csv('./1_18_homework/temp_file_2.csv')
 datasets_2 = pd.read_csv('./1_18_homework/temp_file_2.csv',index_col=0)
+np.save('./1_18_homework/2.npy',arr = datasets_2.values)
+datasets = np.load('2.npy')
 col=14-len(drop_col)
 scaler = MinMaxScaler()
 datasets_minmaxed = scaler.fit_transform(datasets_2)
@@ -122,22 +127,15 @@ es = EarlyStopping(monitor = 'val_loss',patience=patience)
 cp = ModelCheckpoint(monitor = 'val_loss',filepath = modelpath,save_best_only=True)
 inputs1 = Input(shape=(x_1_train.shape[1],x_1_train.shape[2]))
 lstm1 = LSTM(64,activation='relu')(inputs1)
-bat1 = BatchNormalization()(lstm1)
-dense1 = Dense(1024,activation='relu')(bat1)
-do1 = Dropout(0.4)(dense1)
-dense1 = Dense(512,activation='relu')(do1)
+dense1 = Dense(1024,activation='relu')(lstm1)
 
 inputs2 = Input(shape=(x_2_train.shape[1],x_2_train.shape[2]))
 lstm2 = LSTM(64,activation='relu')(inputs2)
-bat2 = BatchNormalization()(lstm2)
-dense2 = Dense(1024,activation='relu')(bat2)
-do2 = Dropout(0.4)(dense2)
-dense2 = Dense(512,activation='relu')(do2)
-
+dense2 = Dense(1024,activation='relu')(lstm2)
+'''
 concat = concatenate([dense1,dense2])
 dense = Dense(512,activation='relu')(concat)
-dropout = Dropout(0.25)(dense)
-dense = Dense(256,activation='relu')(dropout)
+dense = Dense(256,activation='relu')(dense)
 dense = Dense(128,activation='relu')(dense)
 dense = Dense(64,activation='relu')(dense)
 dense = Dense(32,activation='relu')(dense)
@@ -147,8 +145,8 @@ outputs = Dense(1)(dense)
 model = Model(inputs=[inputs1,inputs2],outputs=outputs)
 model.compile(loss = 'mse',optimizer = 'adam',metrics=['mae'])
 hist = model.fit([x_1_train,x_2_train],y_1_train,validation_split=0.2,epochs=epochs,batch_size=batch_size,verbose=1,callbacks=[es,cp])
-
-model = load_model('concat_16_epoch10000000_patience1500_batch2_size30.h5')
+'''
+model = load_model(modelpath)
 y_pred = model.predict([x_1_test,x_2_test])
 for i in range(1,50,7):
      print("예상_13 : {}     실제 : {}".format(round(y_pred[i][0]),y_1_test[i]))
