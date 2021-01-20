@@ -5,11 +5,10 @@ validation_split = 0.2
 
 import numpy as np
 import pandas as pd
-from tensorflow.keras.models import Sequential,Model,load_model
+from tensorflow.keras.models import Sequential,Model
 from tensorflow.keras.layers import LSTM,Dense,Dropout,LayerNormalization,BatchNormalization,Input,concatenate,Reshape
 from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
 from sklearn.preprocessing import MinMaxScaler
-import matplotlib.pyplot as plt
 def split_x(data,x_row,x_col):
     x = []
     for i in range(len(data)-x_row+1):
@@ -64,9 +63,11 @@ print(y.shape)
 
 
 
-modelpath = './데이콘/태양열/data/일단킵.h5'
-modelpath_2 = './데이콘/태양열/data/model_binary.h5'
-'''
+modelpath = './데이콘/태양열/data/model0120concat_batch{}_epoch{}_validation_split{}.h5'.format(batch_size,epochs,validation_split)
+cp = ModelCheckpoint(monitor='val_loss',filepath = modelpath,save_best_only=True)
+es = EarlyStopping(monitor='val_loss',patience=patience)
+reduce_lr = ReduceLROnPlateau(monitor = 'val_loss',patience=patience/2,factor=0.5)
+inputs = Input(shape=(336,8))
 lstm = LSTM(16,activation='relu')(inputs)
 dense = Dense(512,activation='relu')(lstm)
 dense = Dense(256,activation='relu')(dense)
@@ -78,7 +79,6 @@ outputs1 = Dense(96,name='output1')(dense1)
 dense2 = Dense(128,activation='sigmoid')(dense)
 outputs2 = Dense(96,activation='sigmoid',name='output2')(dense2)
 model = Model(inputs = inputs , outputs=[outputs1,outputs2])
-'''
 '''
 model = Sequential()
 model.add(LSTM(32,activation='relu',input_shape=(336,8)))
@@ -94,57 +94,8 @@ model.add(Dense(4,activation='relu'))
 model.add(Dense(2,activation='relu'))
 '''
 
-#model.compile(loss = ['mse','binary_crossentropy'],optimizer='adam',metrics=['mse','accuracy'])
-#model.fit(x,[y1,y2],validation_split=validation_split,epochs=epochs,batch_size=batch_size,verbose=1,callbacks=[es,cp,reduce_lr])
-model = load_model(modelpath)
-model2 = load_model(modelpath_2)
+model.compile(loss = ['mse','binary_crossentropy'],optimizer='adam',metrics=['mse','accuracy'])
+model.fit(x,[y1,y2],validation_split=validation_split,epochs=epochs,batch_size=batch_size,verbose=1,callbacks=[es,cp,reduce_lr])
 
-
-
-
-result = []
-binary = []
-for i in range(81):
-    # 데이터 로드
-    filename = './데이콘/태양열/data/test/{}.csv'.format(i)
-    df=pd.read_csv(filename)
-    # sun_up 추가
-    sun_up=[]
-    Time=[]
-    for i in range(len(df)):
-        temp = 60*df.iloc[i,1]+df.iloc[i,2]
-        Time.append(temp)
-        temp = df.iloc[i,-1]
-        if temp>0.0:
-            sun_up.append(1)
-        else :
-            sun_up.append(0)
-    df['Sun_up']=sun_up
-    df['Time']=Time
-    df.drop(drop_columns,axis='columns',inplace=True)
-    datasets = df.values[:,:]
-    datasets = scaler.transform(datasets)
-    result.append(datasets)
-    binary.append(datasets[:,-2].reshape(7,48))
-
-a = np.array(result)
-binary = np.array(binary)
-predict = model.predict(a)
-print(predict[0].shape)
-
-predict2 = model2.predict(binary)
-
-
-a = predict[0].reshape(-1,1)
-b = np.round(predict2.reshape(-1,1))
-
-k=40*15
-l=40*18
-import matplotlib.pyplot as plt
-plt.plot(a[k:l]*b[k:l])
-plt.plot(a[k:l])
-plt.grid()
-plt.show()
-print(b[:192].reshape(-1,48))
 
 

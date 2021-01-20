@@ -137,14 +137,63 @@ predict2 = model2.predict(binary)
 
 a = predict[0].reshape(-1,1)
 b = np.round(predict2.reshape(-1,1))
+print(a.shape)
 
-k=40*15
-l=40*18
-import matplotlib.pyplot as plt
-plt.plot(a[k:l]*b[k:l])
-plt.plot(a[k:l])
-plt.grid()
-plt.show()
-print(b[:192].reshape(-1,48))
+#submit = pd.read_csv('.\데이콘\태양열\data\sample_submission.csv',index_col=0)
+for i in range(9):
+    submit.iloc[:,i] = a*b
+
+#submit.to_csv('./데이콘/태양열/data/submit_file.csv')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+index = []
+for i in range(len(a)):
+    number = (i)//48
+    day = (i//48)%2+7
+    hour = (i//2)-((i//2)//24)*24
+    if i%2==0:
+        minute = str(0)+str(0)
+    else:
+        minute = str(30)
+    indexname = '{}.csv_Day{}_{}h{}m'.format(str(number),str(day),str(hour),minute)
+    index.append(indexname)
+
+count=0
+for i in index:
+    count+=1
+    print(i)
+    if(count>=120):
+        break;
+print(len(index))
+'''
 
 
