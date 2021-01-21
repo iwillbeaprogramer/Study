@@ -99,13 +99,9 @@ inputs1 = Input(shape=(336,8))
 lstm = LSTM(16,activation='relu')(inputs)
 dense = Dense(512,activation='relu')(lstm)
 dense = Dense(256,activation='relu')(dense)
-
 inputs2 = Input(shape=())
-
-
 dense1 = Dense(128,activation='relu')(dense)
 outputs1 = Dense(96,name='output1')(dense1)
-
 dense2 = Dense(128,activation='sigmoid')(dense)
 outputs2 = Dense(96,activation='sigmoid',name='output2')(dense2)
 model = Model(inputs = inputs , outputs=[outputs1,outputs2])
