@@ -131,19 +131,21 @@ a = np.array(result)
 binary = np.array(binary)
 predict = model.predict(a)
 print(predict[0].shape)
+predict2 = np.round(model2.predict(binary).reshape(-1,1))
 
-predict2 = model2.predict(binary)
 
-
-a = predict[0].reshape(-1,1)
-b = np.round(predict2.reshape(-1,1))
+#a = predict[0].reshape(-1,1)
+b = np.round(predict2)
 print(a.shape)
 
-#submit = pd.read_csv('.\데이콘\태양열\data\sample_submission.csv',index_col=0)
-for i in range(9):
-    submit.iloc[:,i] = a*b
+submit = pd.read_csv('./데이콘/태양열/data/sample_submission.csv',index_col=0)
+for i in [1,2,3,4,5,6,7,8,9]:
+    path = './데이콘/태양열/data/01_20/{}Standard_LNormalizationO_model0120concat_batch48_epoch60_validation_split0.2.h5'.format(i)
+    model = load_model(path,compile=False)
+    k = model.predict(a)
+    submit.iloc[:,i-1] = k.reshape(-1,1)*predict2
 
-#submit.to_csv('./데이콘/태양열/data/submit_file.csv')
+submit.to_csv('./데이콘/태양열/data/submit_file.csv')
 
 
 
