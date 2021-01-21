@@ -1,15 +1,18 @@
 batch_size = 256
 patience=10
-epochs = 10000
-validation_split = 0.2
+epochs = 40
+validation_split = 0.15
+lr = 0.025
 
 import numpy as np
 import pandas as pd
 from tensorflow.keras.models import Sequential,Model
-from tensorflow.keras.layers import LSTM,Dense,Dropout,LayerNormalization,BatchNormalization,Input,concatenate,Reshape
+from tensorflow.keras.layers import LSTM,Dense,Dropout,LayerNormalization,BatchNormalization,Input,concatenate,Reshape,Conv1D,BatchNormalization,Activation,MaxPooling1D,Flatten
 from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler,StandardScaler
 from tensorflow.keras.backend import mean, maximum
+from tensorflow.keras.optimizers import Adam,Adadelta,Adamax,Adagrad
+optimizer = Adam(lr=lr)
 
 def quantile_loss(q, y, pred):
     err = (y-pred)
@@ -60,7 +63,7 @@ print(df)
 print(y.shape)
 df.drop(drop_columns,axis='columns',inplace=True)
 datasets = df.values[:,:]
-scaler = MinMaxScaler()
+scaler = StandardScaler()
 datasets = scaler.fit_transform(datasets)
 
 x = split_x(datasets,x_row,x_col)[:-96]
@@ -68,40 +71,74 @@ print(x.shape)
 print(y.shape)
 
 
+# q_lst = [0.1,0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+# for i,q in enumerate(q_lst):
+#     modelpath = './데이콘/태양열/data/01_20/{}Standard_LNormalizationO_model0120concat_batch{}_epoch{}_validation_split{}.h5'.format(i+1,batch_size,epochs,validation_split)
+#     cp = ModelCheckpoint(monitor='val_loss',filepath = modelpath,save_best_only=True)
+#     es = EarlyStopping(monitor='val_loss',patience=patience)
+#     inputs = Input(shape=(336,8))
+#     conv1d = Conv1D(256,kernel_size=2,padding='valid')(inputs)
+#     conv1d = BatchNormalization()(conv1d)
+#     conv1d = Activation('relu')(conv1d)
+#     conv1d = Conv1D(128,kernel_size=2,padding='valid')(conv1d)
+#     conv1d = BatchNormalization()(conv1d)
+#     conv1d = Activation('relu')(conv1d)
+#     conv1d = Conv1D(64,kernel_size=2,padding='valid')(conv1d)
+#     conv1d = BatchNormalization()(conv1d)
+#     conv1d = Activation('relu')(conv1d)
+#     conv1d = Conv1D(64,kernel_size=2,padding='valid')(conv1d)
+#     f = Flatten()(conv1d)
+#     dense = Dense(1024,activation='relu')(f)
+#     dense = Dense(512,activation='relu')(dense)
+#     dense = Dense(256,activation='relu')(dense)
+#     outputs1 = Dense(96)(dense)
+#     model = Model(inputs = inputs , outputs=outputs1)
+#     model.compile(loss = lambda y,pred: quantile_loss(q,y,pred), optimizer=optimizer, metrics=['mse'])
+#     model.fit(x,y1,validation_split=validation_split,epochs=epochs,batch_size=batch_size,verbose=1,callbacks=[es,cp])
+
 q_lst = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-for q in q_lst:
-    modelpath = './데이콘/태양열/data/{}_model0119concat_batch{}_epoch{}_validation_split{}.h5'.format(q,batch_size,epochs,validation_split)
+for i,q in enumerate(q_lst):
+    modelpath = './데이콘/태양열/data/01_21/{}_model0120concat_batch{}_epoch{}_validation_split{}.h5'.format(i+1,batch_size,epochs,validation_split)
     cp = ModelCheckpoint(monitor='val_loss',filepath = modelpath,save_best_only=True)
     es = EarlyStopping(monitor='val_loss',patience=patience)
-    reduce_lr = ReduceLROnPlateau(monitor = 'val_loss',patience=patience/2,factor=0.5)
+    reduce_lr = ReduceLROnPlateau(monitor = 'val_loss',patience=patience/2,factor=0.85)
     inputs = Input(shape=(336,8))
-    lstm = LSTM(16,activation='relu')(inputs)
-    dense = Dense(512,activation='relu')(lstm)
+    conv1d = Conv1D(64,kernel_size=2,padding='valid')(inputs)
+    lstm = LSTM(32,activation='relu',return_sequences=True)(conv1d)
+    bat = LayerNormalization()(lstm)
+    lstm = LSTM(16,activation='relu')(bat)
+    bat = LayerNormalization()(lstm)
+    dense = Dense(1024,activation='relu')(bat)
+    dense = Dense(512,activation='relu')(dense)
     dense = Dense(256,activation='relu')(dense)
-
-
-    dense1 = Dense(128,activation='relu')(dense)
-    outputs1 = Dense(96,name='output1')(dense1)
-
-
+    outputs1 = Dense(96)(dense)
     model = Model(inputs = inputs , outputs=outputs1)
-    '''
-    model = Sequential()
-    model.add(LSTM(32,activation='relu',input_shape=(336,8)))
-    model.add(Dense(1024,activation='relu'))
-    model.add(Dense(512,activation='relu'))
-    model.add(Dense(256,activation='relu'))
-    model.add(Dense(128,activation='relu'))
-    model.add(Dense(64,activation='relu'))
-    model.add(Dense(32,activation='relu'))
-    model.add(Dense(16,activation='relu'))
-    model.add(Dense(8,activation='relu'))
-    model.add(Dense(4,activation='relu'))
-    model.add(Dense(2,activation='relu'))
-    '''
-
-    model.compile(loss = lambda y,pred: quantile_loss(q,y,pred), optimizer='adam', metrics=['mse'])
+    model.compile(loss = lambda y,pred: quantile_loss(q,y,pred), optimizer=optimizer, metrics=['mse'])
     model.fit(x,y1,validation_split=validation_split,epochs=epochs,batch_size=batch_size,verbose=1,callbacks=[es,cp,reduce_lr])
 
 
+#1 : 1.5
+#2 : 2.6   단순모델 윈
+#3 : 3.1
+#4 : 7.3
+#5 : 9.2
+#6 : 3.1
+#7 : 2.5
+#8 : 2.5
+#9 : 1.4
 
+#549
+
+
+
+'''
+1 : 1.5
+2 : 3.6
+3 : 5.5
+4 : 3.2
+5 : 3.0
+6 : 2.5
+7 : 2.2
+8 : 1.6
+9 : 0.8
+'''
