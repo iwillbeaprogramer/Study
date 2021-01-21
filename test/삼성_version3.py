@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
+from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
 from tensorflow.keras.models import Sequential,load_model,Model
 from tensorflow.keras.layers import Dense,LSTM,Conv1D,MaxPool1D,Dropout,Flatten,Input,concatenate,AveragePooling1D,BatchNormalization
 from sklearn.preprocessing import MinMaxScaler
@@ -82,30 +82,6 @@ col=14-len(drop_col)
 print(datasets)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 y = datasets.iloc[size-1:,1].values #(2378,)
 
 
@@ -120,10 +96,11 @@ x_train,x_val,y_train,y_val = train_test_split(x_train,y_train,test_size=0.2)
 x_train=x_train.reshape(-1,size,col).astype('float32')
 x_test=x_test.reshape(-1,size,col).astype('float32')
 x_val=x_val.reshape(-1,size,col).astype('float32')
-'''
-modelpath = "./samsung//Samsung_best_model_s_col{}_original_version2_2.h5".format(col)
+
+modelpath = "./samsung//Samsung_best_model_s_col{}_original_version2_2____.h5".format(col)
 es = EarlyStopping(monitor = 'val_loss',patience=200)
 cp = ModelCheckpoint(monitor = 'val_loss',filepath = modelpath,save_best_only=True)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss',factor=0.5,patience=5,verbose=1)
 model = Sequential()
 model.add(LSTM(64,activation='relu',input_shape=(x_train.shape[1],x_train.shape[2])))
 model.add(Dense(1024,activation='relu'))
@@ -137,7 +114,7 @@ model.add(Dense(8,activation='relu'))
 model.add(Dense(1))
 model.compile(loss = 'mse',optimizer = 'adam')
 hist = model.fit(x_train,y_train,validation_data=(x_val,y_val),epochs=10000,batch_size=4,verbose=1,callbacks=[es,cp])
-'''
+
 model = load_model("./samsung/Samsung_best_model_s_col7_original_version2_2.h5")
 y_pred = model.predict(x_test)
 
