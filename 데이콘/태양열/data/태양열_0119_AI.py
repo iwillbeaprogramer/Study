@@ -96,25 +96,22 @@ print(y.shape)
 #     model.compile(loss = lambda y,pred: quantile_loss(q,y,pred), optimizer=optimizer, metrics=['mse'])
 #     model.fit(x,y1,validation_split=validation_split,epochs=epochs,batch_size=batch_size,verbose=1,callbacks=[es,cp])
 
-q_lst = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+q_lst = [0.3]
 for i,q in enumerate(q_lst):
-    modelpath = './데이콘/태양열/data/01_21/{}_model0120concat_batch{}_epoch{}_validation_split{}.h5'.format(i+1,batch_size,epochs,validation_split)
+    modelpath = './데이콘/태양열/data/01_21/_1___{}_model0120concat_batch{}_epoch{}_validation_split{}.h5'.format(str(int(q*10)),batch_size,epochs,validation_split)
     cp = ModelCheckpoint(monitor='val_loss',filepath = modelpath,save_best_only=True)
     es = EarlyStopping(monitor='val_loss',patience=patience)
-    reduce_lr = ReduceLROnPlateau(monitor = 'val_loss',patience=patience/2,factor=0.85)
+    #reduce_lr = ReduceLROnPlateau(monitor = 'val_loss',patience=patience/2,factor=0.85)
     inputs = Input(shape=(336,8))
     conv1d = Conv1D(64,kernel_size=2,padding='valid')(inputs)
-    lstm = LSTM(32,activation='relu',return_sequences=True)(conv1d)
-    bat = LayerNormalization()(lstm)
-    lstm = LSTM(16,activation='relu')(bat)
-    bat = LayerNormalization()(lstm)
-    dense = Dense(1024,activation='relu')(bat)
+    lstm = LSTM(16,activation='relu')(conv1d)
+    dense = Dense(1024,activation='relu')(lstm)
     dense = Dense(512,activation='relu')(dense)
     dense = Dense(256,activation='relu')(dense)
     outputs1 = Dense(96)(dense)
     model = Model(inputs = inputs , outputs=outputs1)
     model.compile(loss = lambda y,pred: quantile_loss(q,y,pred), optimizer=optimizer, metrics=['mse'])
-    model.fit(x,y1,validation_split=validation_split,epochs=epochs,batch_size=batch_size,verbose=1,callbacks=[es,cp,reduce_lr])
+    model.fit(x,y1,validation_split=validation_split,epochs=epochs,batch_size=batch_size,verbose=1,callbacks=[es,cp])
 
 
 #1 : 1.5
@@ -141,4 +138,18 @@ for i,q in enumerate(q_lst):
 7 : 2.2
 8 : 1.6
 9 : 0.8
+'''
+
+
+
+'''
+1 - 1.5
+2 - 3.1
+3 - 4.7
+4 - 3.0
+5 - 7.9
+6 - 9.3
+7 - 2.0
+8 - 1.5
+9 - 1.1
 '''
