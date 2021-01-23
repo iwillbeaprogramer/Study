@@ -8,7 +8,7 @@ import pandas as pd
 from tensorflow.keras.models import Sequential,Model,load_model
 from tensorflow.keras.layers import LSTM,Dense,Dropout,LayerNormalization,BatchNormalization,Input,concatenate,Reshape
 from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler,StandardScaler
 import matplotlib.pyplot as plt
 def split_x(data,x_row,x_col):
     x = []
@@ -24,12 +24,20 @@ def split_y(data,y_row,y_col):
         y.append(subset)
     return np.array(y)
 
-x_col,x_row,y_col,y_row = 9,336,-3,96
+x_col,x_row,y_col,y_row = 9,336,-4,96
 
 
 # ['Day', 'Hour', 'Minute', 'DHI', 'DNI', 'WS', 'RH', 'T', 'TARGET','Sun_up]
 drop_columns = ['Day','Hour','Minute']
 df = pd.read_csv('./데이콘/태양열/data/train/train.csv')
+
+ghi = []
+for i in range(len(df)):
+    temp = np.cos(np.pi/2-np.abs(df.iloc[i,1]%12 - 6)/6*np.pi/2)
+    ghi.append(temp)
+df['cos'] = ghi
+df.insert(1,'GHI',df['DNI']*df['cos']+df['DHI'])
+df.drop(['cos'], axis= 1, inplace = True)
 
 # sunup 추가
 sunup=[]
@@ -55,7 +63,7 @@ print(df)
 print(y.shape)
 df.drop(drop_columns,axis='columns',inplace=True)
 datasets = df.values[:,:]
-scaler = MinMaxScaler()
+scaler = StandardScaler()
 datasets = scaler.fit_transform(datasets)
 
 x = split_x(datasets,x_row,x_col)[:-96]
@@ -64,7 +72,7 @@ print(y.shape)
 
 
 
-modelpath = './데이콘/태양열/data/일단킵.h5'
+# modelpath = './데이콘/태양열/data/일단킵.h5'
 modelpath_2 = './데이콘/태양열/data/model_binary.h5'
 '''
 lstm = LSTM(16,activation='relu')(inputs)
@@ -96,7 +104,7 @@ model.add(Dense(2,activation='relu'))
 
 #model.compile(loss = ['mse','binary_crossentropy'],optimizer='adam',metrics=['mse','accuracy'])
 #model.fit(x,[y1,y2],validation_split=validation_split,epochs=epochs,batch_size=batch_size,verbose=1,callbacks=[es,cp,reduce_lr])
-model = load_model(modelpath)
+#model = load_model(modelpath)
 model2 = load_model(modelpath_2)
 
 
@@ -104,14 +112,18 @@ model2 = load_model(modelpath_2)
 
 result = []
 binary = []
+
 for i in range(81):
     # 데이터 로드
     filename = './데이콘/태양열/data/test/{}.csv'.format(i)
     df=pd.read_csv(filename)
     # sun_up 추가
+    ghi=[]
     sun_up=[]
     Time=[]
     for i in range(len(df)):
+        temp = np.cos(np.pi/2-np.abs(df.iloc[i,1]%12 - 6)/6*np.pi/2)
+        ghi.append(temp)
         temp = 60*df.iloc[i,1]+df.iloc[i,2]
         Time.append(temp)
         temp = df.iloc[i,-1]
@@ -119,33 +131,48 @@ for i in range(81):
             sun_up.append(1)
         else :
             sun_up.append(0)
+    df['cos'] = ghi
+    df.insert(1,'GHI',df['DNI']*df['cos']+df['DHI'])
+    df.drop(['cos'], axis= 1, inplace = True)
     df['Sun_up']=sun_up
     df['Time']=Time
     df.drop(drop_columns,axis='columns',inplace=True)
     datasets = df.values[:,:]
     datasets = scaler.transform(datasets)
-    result.append(datasets)
+    result.append(datasets.reshape(7,48,9))
     binary.append(datasets[:,-2].reshape(7,48))
 
 a = np.array(result)
-binary = np.array(binary)
-predict = model.predict(a)
-print(predict[0].shape)
-predict2 = np.round(model2.predict(binary).reshape(-1,1))
+a=[]
+for i in result:
+    c=[]
+    for j in range(len(i)):
+        c.append(i[j])
+    a.append(np.array(c))
+a=np.array(a)
+#binary = np.array(binary)
+#predict = model.predict(a)
+#print(predict[0].shape)
+#predict2 = np.round(model2.predict(binary).reshape(-1,1))
 
 
 #a = predict[0].reshape(-1,1)
-b = np.round(predict2)
-print(a.shape)
+#b = np.round(predict2)
+#print(a.shape)
 
 submit = pd.read_csv('./데이콘/태양열/data/sample_submission.csv',index_col=0)
 for i in [1,2,3,4,5,6,7,8,9]:
-    path = './데이콘/태양열/data/01_20/{}Standard_LNormalizationO_model0120concat_batch48_epoch60_validation_split0.2.h5'.format(i)
+    path = './데이콘/태양열/data/01_22/{}_concat_all_home.h5'.format(i)
+    # path = './데이콘/태양열/data/01_21//{}Standard_LNormalizationO_model0120concat_batch48_epoch60_validation_split0.2.h5'.format(i)
     model = load_model(path,compile=False)
     k = model.predict(a)
-    submit.iloc[:,i-1] = k.reshape(-1,1)*predict2
+    submit.iloc[:,i-1] = k.reshape(-1,1) # *predict2
 
-submit.to_csv('./데이콘/태양열/data/submit_file.csv')
+submit.to_csv('./데이콘/태양열/data/01_22/submit_file_0121.csv')
+
+
+
+
 
 
 
