@@ -43,9 +43,26 @@ def preprocess_data(data, is_train=True):
     dp = ( c * gamma) / (b - gamma)
     data.insert(1,'Td',dp)
     data.insert(1,'T-Td',data['T']-data['Td'])
-    # data.insert(1,'GHI',data['DNI']+data['DHI'])
+    data.insert(1,'GHI',data['DNI']+data['DHI'])
+
+    sunup=[]
+    for i in range(len(data)):
+        temp = data.iloc[i,-1]
+        if temp>0.0:
+            sunup.append(1)
+        else :
+            sunup.append(0)
+    data['Sun_up']=sunup
+
+    # Time 추가
+    Time=[]
+    for i in range(len(data)):
+        temp = 60*data.iloc[i,1]+data.iloc[i,2]
+        Time.append(temp)
+    data['Time']=Time
+
     temp = data.copy()
-    temp = temp[['Hour','TARGET','T-Td','DHI','DNI','WS','RH','T']]
+    temp = temp[['Hour','TARGET','T-Td','DHI','DNI','WS','RH','T','Time','Sun_up']]
 
     if is_train==True:          
         temp['Target1'] = temp['TARGET'].shift(-48).fillna(method='ffill')   # 다음날의 Target
@@ -54,7 +71,7 @@ def preprocess_data(data, is_train=True):
         return temp.iloc[:-96]  # 뒤에서 이틀은 뺀다. (예측하고자 하는 날짜이기 때문)
 
     elif is_train == False:
-        temp = temp[['Hour','TARGET','T-Td','DHI','DNI','WS','RH','T']]
+        temp = temp[['Hour','TARGET','T-Td','DHI','DNI','WS','RH','T','Time','Sun_up']]
 
         return temp.iloc[-48:, :]
 
