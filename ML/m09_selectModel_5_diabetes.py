@@ -2,11 +2,11 @@ import warnings
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 from sklearn.utils.testing import all_estimators
-from sklearn.datasets import load_boston
+from sklearn.datasets import load_diabetes
 
 
 warnings.filterwarnings('ignore')
-datasets = load_boston()
+datasets = load_diabetes()
 x = datasets.data
 y = datasets.target
 x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2,random_state=44)
