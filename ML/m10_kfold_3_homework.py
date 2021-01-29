@@ -23,58 +23,37 @@ y = datasets.target
 # x,y = load_iris(return_X_y=True)
 kfold = KFold(n_splits=5,shuffle=True)
 
-x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2,random_state=77,shuffle=True)
-scaler = MinMaxScaler()
-scaler.fit(x_train)
-x_train = scaler.transform(x_train)
-x_test = scaler.transform(x_test)
 
 
-
-model_list=[]
 model1 = LinearSVC()
-model2 = SVC()
-model3 = KNeighborsClassifier()
-model4 = LogisticRegression()
-model5 = DecisionTreeClassifier()
-model6 = RandomForestClassifier()
-model_list.append(model1)
-model_list.append(model2)
-model_list.append(model3)
-model_list.append(model4)
-model_list.append(model5)
-model_list.append(model6)
 
-scores = cross_val_score(model1,x_train,y_train,cv=kfold)
-print("scores : ",scores)
+for train_index, test_index in kfold.split(x):
+#    print('================================================================================')
+#    print("TRAIN:", train_index, "\nTEST:", test_index) 
 
+    # train : test
+    x_train, x_test = x[train_index], x[test_index] 
+    y_train, y_test = y[train_index], y[test_index]
+      
+    # train : test : validation
+    x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, train_size = 0.8, random_state = 77, shuffle = False) 
 
-for k,i in enumerate(model_list):
-    i.fit(x_train,y_train)
-    score = i.score(x_test,y_test)
-    if k==0:
-        print("LinearSVC Accuracy : ", score)
-    elif k==1:
-        print("SVC Accuracy : ", score)
-    elif k==2:
-        print("KNeighbors Accuracy : ", score)
-    elif k==3:
-        print("LogisticRegressor Accuracy : ", score)
-    elif k==4:
-        print("DecisionTree Accuracy : ", score)
-    else:
-        print("RandomForest Accuracy : ", score)
+#    print('x_train.shape : ', x_train.shape)        # (96, 4)
+#    print('x_test.shape  : ', x_test.shape)         # (30, 4)
+#    print('x_val.shape   : ', x_val.shape)          # (24, 4)
 
-'''
-LinearSVC Accuracy :  0.9333333333333333
-SVC Accuracy :  0.9333333333333333
-KNeighbors Accuracy :  0.9333333333333333
-LogisticRegressor Accuracy :  0.9333333333333333
-DecisionTree Accuracy :  0.9
-RandomForest Accuracy :  0.9333333333333333
-Tensorflow Accuracy : 0.9666666388511658
-'''
+#    print('y_train.shape : ', y_train.shape)        # (96, )
+#    print('y_test.shape  : ', y_test.shape)         # (30, )
+#    print('y_val.shape   : ', y_val.shape)          # (24, )
 
+    # print('x_train.shape : \n', x_train)              
+    # print('x_test.shape  : \n', x_test)               
+    # print('x_val.shape   : \n', x_val)   
 
+    # print('y_train.shape : \n', y_train)              
+    # print('y_test.shape  : \n', y_test)
+    # print('y_val.shape   : \n', y_val)
 
+    scores = cross_val_score(model1,x_train,y_train,cv=kfold)
+    print("scores : ",scores)
 
