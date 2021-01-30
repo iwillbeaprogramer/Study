@@ -65,8 +65,7 @@ print("acc : ",acc)
 ['CRIM' 'ZN' 'INDUS' 'CHAS' 'NOX' 'RM' 'AGE' 'DIS' 'RAD' 'TAX' 'PTRATIO'
  'B' 'LSTAT']
 acc :  0.8964617366043943
-13
-13
+
 ['ZN', 'CHAS', 'RAD', 'INDUS']
 acc :  0.9165009023279631
 '''
