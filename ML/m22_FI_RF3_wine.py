@@ -60,11 +60,16 @@ y = datasets.target
 acc = model.score(x_test,y_test)
 print("acc : ",acc)
 
-'''
-acc :  0.9629629629629629
-acc :  1.0
-'''
 
+'''
+랜포
+['alcohol', 'malic_acid', 'ash', 'alcalinity_of_ash', 'magnesium', 'total_phenols', 'flavanoids', 'nonflavanoid_phenols', 'proanthocyanins', 'color_intensity', 'hue', 'od280/od315_of_diluted_wines', 'proline']
+acc :  1.0
+
+
+['ash', 'nonflavanoid_phenols', 'proanthocyanins', 'alcalinity_of_ash']
+acc :  0.9259259259259259
+'''
 
 
 
