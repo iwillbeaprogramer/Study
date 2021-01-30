@@ -65,7 +65,6 @@ print("acc : ",acc)
 acc :  0.9534883720930233
 ['mean symmetry', 'mean fractal dimension', 'symmetry error', 'texture error', 'smoothness error', 'compactness error', 'fractal dimension error', 'mean compactness']
 acc :  0.9418604651162791
-
 acc :  0.9534883720930233
 ['mean fractal dimension', 'mean smoothness', 'mean symmetry', 'mean radius', 'concave points error', 'worst fractal dimension', 'symmetry error', 'mean compactness']
 acc :  0.9883720930232558
