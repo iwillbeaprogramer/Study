@@ -72,8 +72,7 @@ acc :  0.9259259259259259
 그부
 ['alcohol', 'malic_acid', 'ash', 'alcalinity_of_ash', 'magnesium', 'total_phenols', 'flavanoids', 'nonflavanoid_phenols', 'proanthocyanins', 'color_intensity', 'hue', 'od280/od315_of_diluted_wines', 'proline']
 acc :  0.9259259259259259
-13
-13
+
 ['nonflavanoid_phenols', 'total_phenols', 'magnesium', 'hue']
 acc :  0.9629629629629629
 '''
