@@ -63,6 +63,8 @@ print("acc : ",acc)
 """
 랜포
 acc :  0.9534883720930233
+
+빼고나서
 ['mean symmetry', 'mean fractal dimension', 'symmetry error', 'texture error', 'smoothness error', 'compactness error', 'fractal dimension error', 'mean compactness']
 acc :  0.9418604651162791
 """
