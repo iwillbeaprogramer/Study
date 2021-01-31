@@ -67,6 +67,7 @@ acc :  0.9565217391304348
 acc :  0.9130434782608695
 
 
+
 그부
 ['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']
 acc :  0.9565217391304348
