@@ -70,6 +70,7 @@ acc :  0.8964617366043943
 ['ZN', 'CHAS', 'RAD', 'INDUS']
 acc :  0.9165009023279631
 
+
 그부
 ['CRIM' 'ZN' 'INDUS' 'CHAS' 'NOX' 'RM' 'AGE' 'DIS' 'RAD' 'TAX' 'PTRATIO'
  'B' 'LSTAT']
