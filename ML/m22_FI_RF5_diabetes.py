@@ -61,9 +61,12 @@ acc = model.score(x_test,y_test)
 print("acc : ",acc)
 
 """
+랜포
 ['age', 'sex', 'bmi', 'bp', 's1', 's2', 's3', 's4', 's5', 's6']
 acc :  0.2829522526284446
 
+
+빼고나서
 ['sex', 's4', 's1', 's3']
 acc :  0.23946603786017884
 """
