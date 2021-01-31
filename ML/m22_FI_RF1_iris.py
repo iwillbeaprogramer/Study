@@ -64,6 +64,7 @@ print("acc : ",acc)
 ['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']
 acc :  0.9565217391304348
 
+
 빼고나서
 ['sepal width (cm)']
 acc :  0.9130434782608695
