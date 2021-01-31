@@ -67,6 +67,8 @@ print("acc : ",acc)
 acc :  1.0
 
 
+
+
 ['ash', 'nonflavanoid_phenols', 'proanthocyanins', 'alcalinity_of_ash']
 acc :  0.9259259259259259
 '''
