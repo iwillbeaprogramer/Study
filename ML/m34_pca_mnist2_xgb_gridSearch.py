@@ -42,9 +42,9 @@ x_test = pca.transform(x_test.reshape(-1,784)/255.0)
 kfold = KFold(n_splits=5,shuffle=True)
 
 
-model = XGBClassifier()
+model = XGBClassifier(n_jobs=8,n_estimators=2000)
 search = RandomizedSearchCV(model,params,verbose=True)
-search.fit(x_train,y_train)
+search.fit(x_train,y_train,eval_metrics='logloss')
 print('result : ')
 print(search.score(x_test,y_test))
 print(search.best_estimator_)
