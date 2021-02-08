@@ -39,6 +39,6 @@ kfold = KFold(n_splits=5,shuffle=True)
 
 
 model = XGBClassifier()
-model.fit(x_train,y_train)
+model.fit(x_train,y_train,eval_metric='logloss',verbose=True,eval_set=[(x_train,y_train),(x_test,y_test)])
 
 print('result : ',model.score(x_test,y_test))
