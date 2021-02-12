@@ -9,12 +9,11 @@ from sklearn.metrics import r2_score,accuracy_score,mean_squared_error
 datasets = load_wine()
 x = datasets.data
 y = datasets.target
-x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.15,shuffle=True,random_state = 66)
+x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.15,shuffle=True,random_state = 66,)
 
 
 model = XGBClassifier(n_estimators = 500,learning_rate = 0.01,n_jobs=8)
 
-print(y)
 model.fit(x_train,y_train,verbose=1,eval_metric = 'mlogloss',eval_set = [(x_train,y_train),(x_test,y_test)])
 aaa = model.score(x_test,y_test)
 print(aaa)
