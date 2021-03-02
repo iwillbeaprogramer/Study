@@ -8,7 +8,7 @@ from tensorflow.keras.layers import Dense,Conv2D,MaxPooling2D,Flatten,LSTM,Dropo
 from tensorflow.keras.callbacks import EarlyStopping
 
 
-es = EarlyStopping(monitor='loss',patience = 10)
+es = EarlyStopping(monitor='val_loss',patience = 10)
 (x_train,y_train),(x_test,y_test) = cifar10.load_data()
 #  (50000, 32, 32, 3) (50000, 1)
 #  (10000, 32, 32, 3) (10000, 1)
