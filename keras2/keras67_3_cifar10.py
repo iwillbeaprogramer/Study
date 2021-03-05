@@ -120,15 +120,3 @@ print("acc : ", acc)
 
 # loss :  1.1506491899490356
 # acc :  0.6115999817848206
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
